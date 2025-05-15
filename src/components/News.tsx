@@ -214,6 +214,14 @@ const News: React.FC = () => {
           }`}
           onClick={closeModal}
         >
+          {/* Bouton de fermeture flottant */}
+          <button
+            onClick={closeModal}
+            className="absolute top-4 right-4 bg-[#f6d9a0] text-[#ca5231] p-2 rounded-full shadow-lg hover:bg-[#ca5231] hover:text-[#f6d9a0] transform hover:rotate-90 transition-all duration-300"
+          >
+            <X className="w-8 h-8" />
+          </button>
+
           <div 
             className={`polaroid-card max-w-4xl w-full max-h-[90vh] overflow-y-auto relative transform ${
               isModalEntering 
@@ -227,23 +235,8 @@ const News: React.FC = () => {
             <div className="tape tape-left"></div>
             <div className="tape tape-right"></div>
 
-            <div className="relative p-8">
-              <button
-                onClick={closeModal}
-                className="absolute top-4 right-4 text-[#ca5231] hover:text-[#ca5231]/80 transition-colors"
-              >
-                <X className="w-8 h-8" />
-              </button>
-
-              <div className="relative aspect-video mb-8">
-                <img
-                  src={selectedNews.image_url}
-                  alt={selectedNews.title}
-                  className="w-full h-full object-cover rounded-lg"
-                />
-              </div>
-
-              <div className="polaroid-date mb-4 font-['Railroad Gothic'] text-xl text-[#ca5231]">
+            <div className="p-8">
+              <div className="polaroid-date mb-6 font-['Railroad Gothic'] text-xl text-[#ca5231] inline-block bg-[#ca5231]/10 px-4 py-2 rounded-full">
                 {new Date(selectedNews.date).toLocaleDateString('fr-FR', {
                   day: 'numeric',
                   month: 'long',
@@ -251,9 +244,17 @@ const News: React.FC = () => {
                 })}
               </div>
 
-              <h3 className="text-4xl font-bold text-[#ca5231] mb-6 font-['Swiss 721 Black Extended BT']">
+              <h3 className="text-4xl font-bold text-[#ca5231] mb-8 font-['Swiss 721 Black Extended BT']">
                 {selectedNews.title}
               </h3>
+
+              <div className="relative aspect-video mb-8 rounded-lg overflow-hidden shadow-xl">
+                <img
+                  src={selectedNews.image_url}
+                  alt={selectedNews.title}
+                  className="w-full h-full object-cover"
+                />
+              </div>
 
               <p className="text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed whitespace-pre-line">
                 {selectedNews.description}

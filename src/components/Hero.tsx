@@ -1,43 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import FlipTimer from './FlipTimer';
-import { supabase } from '../lib/supabase';
-
-interface PosterSettings {
-  image_url: string;
-  alt_text: string;
-  enabled: boolean;
-}
-
-const defaultPosterSettings: PosterSettings = {
-  image_url: 'https://i.ibb.co/FL3xY1gP/FDBH-2025-R-cup-r-R-cup-r-R-cup-r.jpg',
-  alt_text: 'Affiche Fête du Bout du Haut 2025',
-  enabled: true
-};
 
 const Hero: React.FC = () => {
-  const [posterSettings, setPosterSettings] = useState<PosterSettings>(defaultPosterSettings);
-
-  useEffect(() => {
-    loadSettings();
-  }, []);
-
-  const loadSettings = async () => {
-    try {
-      const { data, error } = await supabase
-        .from('settings')
-        .select('value')
-        .eq('key', 'poster_settings')
-        .maybeSingle();
-
-      if (error) throw error;
-      if (data?.value) {
-        setPosterSettings({ ...defaultPosterSettings, ...data.value });
-      }
-    } catch (err) {
-      console.error('Erreur lors du chargement des paramètres:', err);
-    }
-  };
-
   return (
     <section 
       id="accueil" 
@@ -116,33 +80,27 @@ const Hero: React.FC = () => {
       {/* Main Content */}
       <div className="container mx-auto px-4 z-10">
         {/* Poster Section */}
-        {posterSettings.enabled && (
-          <div className="max-w-4xl mx-auto relative">
-            {/* Hirondelles autour de l'affiche */}
-            <div className="absolute -top-12 -left-16 transform rotate-25">
-              <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-10 h-auto" style={{ opacity: 0.8 }} />
-            </div>
-            <div className="absolute top-1/6 -right-20 transform -rotate-15">
-              <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-8 h-auto" style={{ opacity: 0.7 }} />
-            </div>
-            <div className="absolute bottom-1/4 -left-24 transform rotate-45">
-              <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-12 h-auto" style={{ opacity: 0.9 }} />
-            </div>
-            <div className="absolute -bottom-8 right-1/4 transform -rotate-30">
-              <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-9 h-auto" style={{ opacity: 0.8 }} />
-            </div>
-            
-            <img 
-              src={posterSettings.image_url}
-              alt={posterSettings.alt_text}
-              className="w-full h-auto rounded-lg shadow-2xl mb-12"
-              onError={(e) => {
-                const target = e.target as HTMLImageElement;
-                target.src = defaultPosterSettings.image_url;
-              }}
-            />
+        <div className="max-w-4xl mx-auto relative">
+          {/* Hirondelles autour de l'affiche */}
+          <div className="absolute -top-12 -left-16 transform rotate-25">
+            <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-10 h-auto" style={{ opacity: 0.8 }} />
           </div>
-        )}
+          <div className="absolute top-1/6 -right-20 transform -rotate-15">
+            <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-8 h-auto" style={{ opacity: 0.7 }} />
+          </div>
+          <div className="absolute bottom-1/4 -left-24 transform rotate-45">
+            <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-12 h-auto" style={{ opacity: 0.9 }} />
+          </div>
+          <div className="absolute -bottom-8 right-1/4 transform -rotate-30">
+            <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-9 h-auto" style={{ opacity: 0.8 }} />
+          </div>
+          
+          <img 
+            src="https://i.ibb.co/FL3xY1gP/FDBH-2025-R-cup-r-R-cup-r-R-cup-r.jpg"
+            alt="Affiche Fête du Bout du Haut 2025"
+            className="w-full h-auto rounded-lg shadow-2xl mb-12"
+          />
+        </div>
       </div>
     </section>
   );

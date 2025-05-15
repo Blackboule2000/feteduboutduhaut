@@ -204,7 +204,7 @@ const News: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal avec style vintage */}
+      {/* Modal avec style polaroid */}
       {selectedNews && (
         <div 
           className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${
@@ -215,72 +215,54 @@ const News: React.FC = () => {
           onClick={closeModal}
         >
           <div 
-            className={`bg-[#f6d9a0] rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl transition-all duration-500 transform ${
+            className={`polaroid-card max-w-4xl w-full max-h-[90vh] overflow-y-auto relative transform ${
               isModalEntering 
-                ? 'translate-y-0 opacity-100 scale-100' 
-                : 'translate-y-8 opacity-0 scale-95'
-            }`}
+                ? 'translate-y-0 opacity-100 scale-100 rotate-0' 
+                : 'translate-y-8 opacity-0 scale-95 rotate-2'
+            } transition-all duration-500 bg-[#f6d9a0]`}
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Bandes de scotch */}
+            <div className="tape tape-top"></div>
+            <div className="tape tape-left"></div>
+            <div className="tape tape-right"></div>
+            <div className="tape tape-bottom"></div>
+
             {/* Motif rétro et bruit */}
-            <div className="absolute inset-0 bg-retro-pattern opacity-10 rounded-xl"></div>
-            <div className="absolute inset-0 bg-noise opacity-20 rounded-xl"></div>
+            <div className="absolute inset-0 bg-retro-pattern opacity-10"></div>
+            <div className="absolute inset-0 bg-noise opacity-20"></div>
 
-            {/* Bordure décorative */}
-            <div className="absolute inset-0 border-[8px] border-[#ca5231]/20 rounded-xl pointer-events-none"></div>
-            <div className="absolute inset-[8px] border-[2px] border-[#ca5231]/30 rounded-lg pointer-events-none"></div>
+            <div className="relative p-8">
+              <button
+                onClick={closeModal}
+                className="absolute top-4 right-4 text-[#ca5231] hover:text-[#ca5231]/80 transition-colors"
+              >
+                <X className="w-8 h-8" />
+              </button>
 
-            {/* Coins ornementaux */}
-            <div className="absolute top-0 left-0 w-12 h-12 border-t-4 border-l-4 border-[#ca5231]/40 rounded-tl-xl"></div>
-            <div className="absolute top-0 right-0 w-12 h-12 border-t-4 border-r-4 border-[#ca5231]/40 rounded-tr-xl"></div>
-            <div className="absolute bottom-0 left-0 w-12 h-12 border-b-4 border-l-4 border-[#ca5231]/40 rounded-bl-xl"></div>
-            <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-[#ca5231]/40 rounded-br-xl"></div>
-
-            <div className="relative">
-              <div className="sticky top-0 z-10 flex justify-between items-center p-6 bg-gradient-to-b from-[#ca5231]/80 to-transparent">
-                <button
-                  onClick={closeModal}
-                  className="flex items-center text-white hover:text-[#f6d9a0] transition-colors font-['Railroad Gothic']"
-                >
-                  <ArrowLeft className="w-6 h-6 mr-2" />
-                  Retour aux actualités
-                </button>
-                <button
-                  onClick={closeModal}
-                  className="text-white hover:text-[#f6d9a0] transition-colors"
-                >
-                  <X className="w-6 h-6" />
-                </button>
-              </div>
-              
-              <div className="relative aspect-video w-full">
-                <div className="absolute inset-0 bg-[#ca5231]/10"></div>
+              <div className="relative aspect-video mb-8">
                 <img
                   src={selectedNews.image_url}
                   alt={selectedNews.title}
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover rounded-lg"
                 />
               </div>
-              
-              <div className="p-8 relative">
-                <div className="font-['Railroad Gothic'] text-xl text-[#ca5231] mb-2">
-                  {new Date(selectedNews.date).toLocaleDateString('fr-FR', {
-                    day: 'numeric',
-                    month: 'long',
-                    year: 'numeric'
-                  })}
-                </div>
-                
-                <h3 className="text-4xl font-bold text-[#ca5231] mb-6 font-['Swiss 721 Black Extended BT']">
-                  {selectedNews.title}
-                </h3>
-                
-                <div className="prose prose-lg max-w-none">
-                  <p className="text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed whitespace-pre-line">
-                    {selectedNews.description}
-                  </p>
-                </div>
+
+              <div className="polaroid-date mb-4 font-['Railroad Gothic'] text-xl text-[#ca5231]">
+                {new Date(selectedNews.date).toLocaleDateString('fr-FR', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
               </div>
+
+              <h3 className="text-4xl font-bold text-[#ca5231] mb-6 font-['Swiss 721 Black Extended BT']">
+                {selectedNews.title}
+              </h3>
+
+              <p className="text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed whitespace-pre-line">
+                {selectedNews.description}
+              </p>
             </div>
           </div>
         </div>

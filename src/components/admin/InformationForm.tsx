@@ -140,7 +140,16 @@ const InformationForm: React.FC = () => {
 
         if (insertError) throw insertError;
       } else {
-        setSettings(data.value);
+        // Ensure the loaded data has all required properties by merging with defaults
+        setSettings({
+          ...defaultSettings,
+          ...data.value,
+          essential_info: {
+            ...defaultSettings.essential_info,
+            ...(data.value?.essential_info || {}),
+            items: data.value?.essential_info?.items || defaultSettings.essential_info.items
+          }
+        });
       }
     } catch (err) {
       console.error('Erreur lors du chargement des paramètres:', err);
@@ -180,7 +189,7 @@ const InformationForm: React.FC = () => {
       essential_info: {
         ...prev.essential_info,
         items: [
-          ...prev.essential_info.items,
+          ...(prev.essential_info?.items || []),
           { title: '', text: '', icon: 'Info' }
         ]
       }
@@ -192,7 +201,7 @@ const InformationForm: React.FC = () => {
       ...prev,
       essential_info: {
         ...prev.essential_info,
-        items: prev.essential_info.items.filter((_, i) => i !== index)
+        items: prev.essential_info?.items?.filter((_, i) => i !== index) || []
       }
     }));
   };
@@ -200,14 +209,14 @@ const InformationForm: React.FC = () => {
   const addImportantNote = () => {
     setSettings(prev => ({
       ...prev,
-      important_notes: [...prev.important_notes, '']
+      important_notes: [...(prev.important_notes || []), '']
     }));
   };
 
   const removeImportantNote = (index: number) => {
     setSettings(prev => ({
       ...prev,
-      important_notes: prev.important_notes.filter((_, i) => i !== index)
+      important_notes: prev.important_notes?.filter((_, i) => i !== index) || []
     }));
   };
 
@@ -215,7 +224,7 @@ const InformationForm: React.FC = () => {
     setSettings(prev => ({
       ...prev,
       eco_initiatives: [
-        ...prev.eco_initiatives,
+        ...(prev.eco_initiatives || []),
         { title: '', icon: 'Leaf', items: [] }
       ]
     }));
@@ -224,29 +233,29 @@ const InformationForm: React.FC = () => {
   const removeEcoInitiative = (index: number) => {
     setSettings(prev => ({
       ...prev,
-      eco_initiatives: prev.eco_initiatives.filter((_, i) => i !== index)
+      eco_initiatives: prev.eco_initiatives?.filter((_, i) => i !== index) || []
     }));
   };
 
   const addEcoInitiativeItem = (initiativeIndex: number) => {
     setSettings(prev => ({
       ...prev,
-      eco_initiatives: prev.eco_initiatives.map((initiative, index) => 
+      eco_initiatives: prev.eco_initiatives?.map((initiative, index) => 
         index === initiativeIndex
-          ? { ...initiative, items: [...initiative.items, ''] }
+          ? { ...initiative, items: [...(initiative.items || []), ''] }
           : initiative
-      )
+      ) || []
     }));
   };
 
   const removeEcoInitiativeItem = (initiativeIndex: number, itemIndex: number) => {
     setSettings(prev => ({
       ...prev,
-      eco_initiatives: prev.eco_initiatives.map((initiative, index) => 
+      eco_initiatives: prev.eco_initiatives?.map((initiative, index) => 
         index === initiativeIndex
-          ? { ...initiative, items: initiative.items.filter((_, i) => i !== itemIndex) }
+          ? { ...initiative, items: initiative.items?.filter((_, i) => i !== itemIndex) || [] }
           : initiative
-      )
+      ) || []
     }));
   };
 
@@ -298,12 +307,12 @@ const InformationForm: React.FC = () => {
               </button>
             </div>
             <div className="space-y-4">
-              {settings.essential_info.items.map((item, index) => (
+              {settings.essential_info?.items?.map((item, index) => (
                 <div key={index} className="flex items-center gap-4">
                   <select
                     value={item.icon}
                     onChange={(e) => {
-                      const newItems = [...settings.essential_info.items];
+                      const newItems = [...(settings.essential_info?.items || [])];
                       newItems[index] = { ...item, icon: e.target.value };
                       setSettings({
                         ...settings,
@@ -320,7 +329,7 @@ const InformationForm: React.FC = () => {
                     type="text"
                     value={item.title}
                     onChange={(e) => {
-                      const newItems = [...settings.essential_info.items];
+                      const newItems = [...(settings.essential_info?.items || [])];
                       newItems[index] = { ...item, title: e.target.value };
                       setSettings({
                         ...settings,
@@ -334,7 +343,7 @@ const InformationForm: React.FC = () => {
                     type="text"
                     value={item.text}
                     onChange={(e) => {
-                      const newItems = [...settings.essential_info.items];
+                      const newItems = [...(settings.essential_info?.items || [])];
                       newItems[index] = { ...item, text: e.target.value };
                       setSettings({
                         ...settings,
@@ -362,13 +371,13 @@ const InformationForm: React.FC = () => {
               <div className="flex items-center">
                 <input
                   type="checkbox"
-                  checked={settings.essential_info.camping.enabled}
+                  checked={settings.essential_info?.camping?.enabled ?? false}
                   onChange={(e) => setSettings({
                     ...settings,
                     essential_info: {
                       ...settings.essential_info,
                       camping: {
-                        ...settings.essential_info.camping,
+                        ...settings.essential_info?.camping,
                         enabled: e.target.checked
                       }
                     }
@@ -380,17 +389,17 @@ const InformationForm: React.FC = () => {
                 </label>
               </div>
 
-              {settings.essential_info.camping.enabled && (
+              {settings.essential_info?.camping?.enabled && (
                 <div className="space-y-4 pl-6">
                   <input
                     type="text"
-                    value={settings.essential_info.camping.title}
+                    value={settings.essential_info?.camping?.title}
                     onChange={(e) => setSettings({
                       ...settings,
                       essential_info: {
                         ...settings.essential_info,
                         camping: {
-                          ...settings.essential_info.camping,
+                          ...settings.essential_info?.camping,
                           title: e.target.value
                         }
                       }
@@ -400,13 +409,13 @@ const InformationForm: React.FC = () => {
                   />
                   <input
                     type="text"
-                    value={settings.essential_info.camping.description}
+                    value={settings.essential_info?.camping?.description}
                     onChange={(e) => setSettings({
                       ...settings,
                       essential_info: {
                         ...settings.essential_info,
                         camping: {
-                          ...settings.essential_info.camping,
+                          ...settings.essential_info?.camping,
                           description: e.target.value
                         }
                       }
@@ -416,13 +425,13 @@ const InformationForm: React.FC = () => {
                   />
                   <input
                     type="text"
-                    value={settings.essential_info.camping.details}
+                    value={settings.essential_info?.camping?.details}
                     onChange={(e) => setSettings({
                       ...settings,
                       essential_info: {
                         ...settings.essential_info,
                         camping: {
-                          ...settings.essential_info.camping,
+                          ...settings.essential_info?.camping,
                           details: e.target.value
                         }
                       }
@@ -432,13 +441,13 @@ const InformationForm: React.FC = () => {
                   />
                   <input
                     type="url"
-                    value={settings.essential_info.camping.image_url}
+                    value={settings.essential_info?.camping?.image_url}
                     onChange={(e) => setSettings({
                       ...settings,
                       essential_info: {
                         ...settings.essential_info,
                         camping: {
-                          ...settings.essential_info.camping,
+                          ...settings.essential_info?.camping,
                           image_url: e.target.value
                         }
                       }
@@ -446,7 +455,7 @@ const InformationForm: React.FC = () => {
                     placeholder="URL de l'image"
                     className="w-full px-3 py-2 border border-yellow-300 rounded-md"
                   />
-                  {settings.essential_info.camping.image_url && (
+                  {settings.essential_info?.camping?.image_url && (
                     <img
                       src={settings.essential_info.camping.image_url}
                       alt="Aperçu camping"
@@ -473,14 +482,14 @@ const InformationForm: React.FC = () => {
             </button>
           </div>
           <div className="space-y-4">
-            {settings.important_notes.map((note, index) => (
+            {settings.important_notes?.map((note, index) => (
               <div key={index} className="flex items-center gap-4">
                 <ArrowRight className="h-5 w-5 text-yellow-600" />
                 <input
                   type="text"
                   value={note}
                   onChange={(e) => {
-                    const newNotes = [...settings.important_notes];
+                    const newNotes = [...(settings.important_notes || [])];
                     newNotes[index] = e.target.value;
                     setSettings({ ...settings, important_notes: newNotes });
                   }}
@@ -512,13 +521,13 @@ const InformationForm: React.FC = () => {
             </button>
           </div>
           <div className="space-y-8">
-            {settings.eco_initiatives.map((initiative, initiativeIndex) => (
+            {settings.eco_initiatives?.map((initiative, initiativeIndex) => (
               <div key={initiativeIndex} className="border border-yellow-200 rounded-lg p-6">
                 <div className="flex items-center gap-4 mb-4">
                   <select
                     value={initiative.icon}
                     onChange={(e) => {
-                      const newInitiatives = [...settings.eco_initiatives];
+                      const newInitiatives = [...(settings.eco_initiatives || [])];
                       newInitiatives[initiativeIndex] = {
                         ...initiative,
                         icon: e.target.value
@@ -535,7 +544,7 @@ const InformationForm: React.FC = () => {
                     type="text"
                     value={initiative.title}
                     onChange={(e) => {
-                      const newInitiatives = [...settings.eco_initiatives];
+                      const newInitiatives = [...(settings.eco_initiatives || [])];
                       newInitiatives[initiativeIndex] = {
                         ...initiative,
                         title: e.target.value
@@ -555,14 +564,14 @@ const InformationForm: React.FC = () => {
                 </div>
 
                 <div className="pl-6 space-y-4">
-                  {initiative.items.map((item, itemIndex) => (
+                  {initiative.items?.map((item, itemIndex) => (
                     <div key={itemIndex} className="flex items-center gap-4">
                       <ArrowRight className="h-5 w-5 text-yellow-600" />
                       <input
                         type="text"
                         value={item}
                         onChange={(e) => {
-                          const newInitiatives = [...settings.eco_initiatives];
+                          const newInitiatives = [...(settings.eco_initiatives || [])];
                           newInitiatives[initiativeIndex].items[itemIndex] = e.target.value;
                           setSettings({ ...settings, eco_initiatives: newInitiatives });
                         }}
@@ -602,7 +611,7 @@ const InformationForm: React.FC = () => {
               </label>
               <input
                 type="text"
-                value={settings.bike_stage.title}
+                value={settings.bike_stage?.title}
                 onChange={(e) => setSettings({
                   ...settings,
                   bike_stage: { ...settings.bike_stage, title: e.target.value }
@@ -616,7 +625,7 @@ const InformationForm: React.FC = () => {
                 Description
               </label>
               <textarea
-                value={settings.bike_stage.description}
+                value={settings.bike_stage?.description}
                 onChange={(e) => setSettings({
                   ...settings,
                   bike_stage: { ...settings.bike_stage, description: e.target.value }
@@ -632,14 +641,14 @@ const InformationForm: React.FC = () => {
               </label>
               <input
                 type="url"
-                value={settings.bike_stage.main_image}
+                value={settings.bike_stage?.main_image}
                 onChange={(e) => setSettings({
                   ...settings,
                   bike_stage: { ...settings.bike_stage, main_image: e.target.value }
                 })}
                 className="w-full px-3 py-2 border border-yellow-300 rounded-md"
               />
-              {settings.bike_stage.main_image && (
+              {settings.bike_stage?.main_image && (
                 <img
                   src={settings.bike_stage.main_image}
                   alt="Image principale"
@@ -654,14 +663,14 @@ const InformationForm: React.FC = () => {
               </label>
               <input
                 type="url"
-                value={settings.bike_stage.secondary_image}
+                value={settings.bike_stage?.secondary_image}
                 onChange={(e) => setSettings({
                   ...settings,
                   bike_stage: { ...settings.bike_stage, secondary_image: e.target.value }
                 })}
                 className="w-full px-3 py-2 border border-yellow-300 rounded-md"
               />
-              {settings.bike_stage.secondary_image && (
+              {settings.bike_stage?.secondary_image && (
                 <img
                   src={settings.bike_stage.secondary_image}
                   alt="Image secondaire"
@@ -675,13 +684,13 @@ const InformationForm: React.FC = () => {
                 Caractéristiques
               </label>
               <div className="space-y-2">
-                {settings.bike_stage.features.map((feature, index) => (
+                {settings.bike_stage?.features?.map((feature, index) => (
                   <div key={index} className="flex items-center gap-4">
                     <input
                       type="text"
                       value={feature}
                       onChange={(e) => {
-                        const newFeatures = [...settings.bike_stage.features];
+                        const newFeatures = [...(settings.bike_stage?.features || [])];
                         newFeatures[index] = e.target.value;
                         setSettings({
                           ...settings,
@@ -693,7 +702,7 @@ const InformationForm: React.FC = () => {
                     <button
                       type="button"
                       onClick={() => {
-                        const newFeatures = settings.bike_stage.features.filter((_, i) => i !== index);
+                        const newFeatures = settings.bike_stage?.features?.filter((_, i) => i !== index) || [];
                         setSettings({
                           ...settings,
                           bike_stage: { ...settings.bike_stage, features: newFeatures }
@@ -712,7 +721,7 @@ const InformationForm: React.FC = () => {
                       ...settings,
                       bike_stage: {
                         ...settings.bike_stage,
-                        features: [...settings.bike_stage.features, '']
+                        features: [...(settings.bike_stage?.features || []), '']
                       }
                     });
                   }}
@@ -729,7 +738,7 @@ const InformationForm: React.FC = () => {
               </label>
               <input
                 type="text"
-                value={settings.bike_stage.participation_title}
+                value={settings.bike_stage?.participation_title}
                 onChange={(e) => setSettings({
                   ...settings,
                   bike_stage: { ...settings.bike_stage, participation_title: e.target.value }
@@ -743,7 +752,7 @@ const InformationForm: React.FC = () => {
                 Texte de la participation
               </label>
               <textarea
-                value={settings.bike_stage.participation_text}
+                value={settings.bike_stage?.participation_text}
                 onChange={(e) => setSettings({
                   ...settings,
                   bike_stage: { ...settings.bike_stage, participation_text: e.target.value }

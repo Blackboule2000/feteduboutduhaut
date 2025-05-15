@@ -120,62 +120,58 @@ const News: React.FC = () => {
 
         <div className="max-w-4xl mx-auto relative">
           <div className="relative h-[700px] overflow-hidden">
-            {newsData.map((news, index) => {
-              const tapeRotation = Math.random() * 6 - 3;
-              
-              return (
-                <div
-                  key={news.id}
-                  className={`absolute inset-0 transition-all duration-1000 transform ${
-                    index === currentIndex 
-                      ? 'opacity-100 translate-x-0 scale-100' 
-                      : index < currentIndex
-                      ? 'opacity-0 -translate-x-full scale-95'
-                      : 'opacity-0 translate-x-full scale-95'
-                  }`}
-                >
-                  <div className="polaroid-card h-full transform hover:rotate-1 transition-transform duration-500 bg-[#f6d9a0]">
-                    <div className="tape tape-top"></div>
-                    <div className="tape tape-left"></div>
-                    <div className="tape tape-right"></div>
-                    
-                    <div 
-                      className="polaroid-image relative h-[70%] overflow-hidden mb-6 cursor-pointer group"
-                      onClick={() => openModal(news)}
-                    >
-                      <img
-                        src={news.image_url}
-                        alt={news.title}
-                        className="w-full h-full object-cover transform transition-all duration-700 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
-                        <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
-                          <button className="bg-[#ca5231] text-white px-6 py-3 rounded-full font-['Railroad Gothic'] text-lg hover:bg-[#ca5231]/80 transition-colors">
-                            En savoir plus
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="text-center px-8">
-                      <div className="polaroid-date mb-4 font-['Railroad Gothic'] text-xl">
-                        {new Date(news.date).toLocaleDateString('fr-FR', {
-                          day: 'numeric',
-                          month: 'long',
-                          year: 'numeric'
-                        })}
-                      </div>
-                      <h3 className="text-3xl font-bold text-[#ca5231] mb-4 transform hover:translate-x-2 transition-transform font-['Swiss 721 Black Extended BT']">
-                        {news.title}
-                      </h3>
-                      <p className="text-xl text-[#ca5231]/80 line-clamp-3 font-['Rainy Days'] leading-relaxed">
-                        {news.description}
-                      </p>
+            {newsData.map((news, index) => (
+              <div
+                key={news.id}
+                className={`absolute inset-0 transition-all duration-1000 transform ${
+                  index === currentIndex 
+                    ? 'opacity-100 translate-x-0 scale-100' 
+                    : index < currentIndex
+                    ? 'opacity-0 -translate-x-full scale-95'
+                    : 'opacity-0 translate-x-full scale-95'
+                }`}
+              >
+                <div className="polaroid-card h-full transform hover:rotate-1 transition-transform duration-500 bg-[#f6d9a0]">
+                  <div className="tape tape-top"></div>
+                  <div className="tape tape-left"></div>
+                  <div className="tape tape-right"></div>
+                  
+                  <div 
+                    className="polaroid-image relative h-[70%] overflow-hidden mb-6 group"
+                  >
+                    <img
+                      src={news.image_url}
+                      alt={news.title}
+                      className="w-full h-full object-cover transform transition-all duration-700 group-hover:scale-110"
+                    />
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-500 flex items-center justify-center">
+                      <button 
+                        onClick={() => openModal(news)}
+                        className="px-8 py-3 bg-[#ca5231] text-white rounded-full opacity-0 transform translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 font-['Railroad Gothic'] text-lg hover:bg-[#ca5231]/80"
+                      >
+                        En savoir plus
+                      </button>
                     </div>
                   </div>
+
+                  <div className="text-center px-8">
+                    <div className="polaroid-date mb-4 font-['Railroad Gothic'] text-xl">
+                      {new Date(news.date).toLocaleDateString('fr-FR', {
+                        day: 'numeric',
+                        month: 'long',
+                        year: 'numeric'
+                      })}
+                    </div>
+                    <h3 className="text-3xl font-bold text-[#ca5231] mb-4 transform hover:translate-x-2 transition-transform font-['Swiss 721 Black Extended BT']">
+                      {news.title}
+                    </h3>
+                    <p className="text-xl text-[#ca5231]/80 line-clamp-3 font-['Rainy Days'] leading-relaxed">
+                      {news.description}
+                    </p>
+                  </div>
                 </div>
-              );
-            })}
+              </div>
+            ))}
           </div>
 
           <button
@@ -213,16 +209,16 @@ const News: React.FC = () => {
         <div 
           className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${
             isModalEntering 
-              ? 'opacity-100 backdrop-blur-sm' 
-              : 'opacity-0 backdrop-blur-none'
+              ? 'opacity-100 bg-black/60 backdrop-blur-sm' 
+              : 'opacity-0 bg-black/0 backdrop-blur-none'
           }`}
           onClick={closeModal}
         >
           <div 
             className={`bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl transition-all duration-500 transform ${
               isModalEntering 
-                ? 'translate-y-0 opacity-100' 
-                : 'translate-y-8 opacity-0'
+                ? 'translate-y-0 opacity-100 scale-100' 
+                : 'translate-y-8 opacity-0 scale-95'
             }`}
             onClick={(e) => e.stopPropagation()}
           >

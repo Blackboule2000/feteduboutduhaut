@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { getIcon } from '../data';
 import { supabase } from '../lib/supabase';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, ArrowRight } from 'lucide-react';
 
 interface Activity {
   id: string;
@@ -111,8 +111,7 @@ const Activities: React.FC = () => {
             return (
               <div 
                 key={activity.id} 
-                className="relative group transform transition-all duration-500 hover:scale-102 cursor-pointer"
-                onClick={() => openModal(activity)}
+                className="relative group transform transition-all duration-500 hover:scale-102"
               >
                 <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
                 <div className="activity-card bg-white/90 backdrop-blur-sm rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative">
@@ -126,13 +125,22 @@ const Activities: React.FC = () => {
 
                   <div className="relative p-6">
                     {activity.image_url && (
-                      <div className="relative aspect-video mb-6 overflow-hidden rounded-xl shadow-xl">
+                      <div className="relative aspect-video mb-6 overflow-hidden rounded-xl shadow-xl group/image">
                         <div className="absolute inset-0 bg-[#ca5231]/10"></div>
                         <img 
                           src={activity.image_url} 
                           alt={activity.name}
                           className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
                         />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/0 to-transparent opacity-0 group-hover/image:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-8">
+                          <button
+                            onClick={() => openModal(activity)}
+                            className="bg-white/90 text-[#ca5231] px-6 py-3 rounded-full font-['Railroad Gothic'] text-lg transform translate-y-10 group-hover/image:translate-y-0 transition-transform duration-500 hover:bg-white flex items-center gap-2"
+                          >
+                            En savoir plus
+                            <ArrowRight className="w-5 h-5" />
+                          </button>
+                        </div>
                       </div>
                     )}
                     <div className="flex items-start space-x-4">
@@ -148,7 +156,7 @@ const Activities: React.FC = () => {
                         </p>
                       </div>
                     </div>
-                    <p className="font-['Rainy Days'] text-lg text-[#ca5231]/90 mt-4">
+                    <p className="font-['Rainy Days'] text-lg text-[#ca5231]/90 mt-4 line-clamp-3">
                       {activity.description}
                     </p>
                   </div>

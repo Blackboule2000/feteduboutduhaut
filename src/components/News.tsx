@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ChevronDown, ChevronUp } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface NewsItem {
@@ -14,6 +14,7 @@ const News: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [newsData, setNewsData] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [expandedId, setExpandedId] = useState<string | null>(null);
 
   useEffect(() => {
     loadNews();
@@ -40,16 +41,21 @@ const News: React.FC = () => {
     setCurrentIndex((prevIndex) => 
       prevIndex === newsData.length - 1 ? 0 : prevIndex + 1
     );
+    setExpandedId(null); // Reset expanded state on slide change
   };
 
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => 
       prevIndex === 0 ? newsData.length - 1 : prevIndex - 1
     );
+    setExpandedId(null); // Reset expanded state on slide change
+  };
+
+  const toggleExpand = (id: string) => {
+    setExpandedId(expandedId === id ? null : id);
   };
 
   useEffect(() => {
-    // Augmentation de l'intervalle à 8000ms (8 secondes)
     const timer = setInterval(nextSlide, 8000);
     return () => clearInterval(timer);
   }, [newsData.length]);
@@ -96,6 +102,7 @@ const News: React.FC = () => {
           <div className="relative h-[700px] overflow-hidden">
             {newsData.map((news, index) => {
               const tapeRotation = Math.random() * 6 - 3;
+              const isExpanded = expandedId === news.id;
               
               return (
                 <div
@@ -112,12 +119,17 @@ const News: React.FC = () => {
                     '--tape-rotation': `${tapeRotation}deg`
                   } as React.CSSProperties}
                 >
-                  <div className="polaroid-card h-full transform hover:rotate-1 transition-transform duration-500 bg-[#f6d9a0]">
+                  <div 
+                    className={`polaroid-card h-full transform hover:rotate-1 transition-all duration-500 bg-[#f6d9a0] cursor-pointer ${
+                      isExpanded ? 'scale-105' : ''
+                    }`}
+                    onClick={() => toggleExpand(news.id)}
+                  >
                     <div className="tape tape-top"></div>
                     <div className="tape tape-left"></div>
                     <div className="tape tape-right"></div>
                     
-                    <div className="polaroid-image relative h-[70%] overflow-hidden mb-6">
+                    <div className={`polaroid-image relative ${isExpanded ? 'h-[40%]' : 'h-[70%]'} overflow-hidden mb-6 transition-all duration-500`}>
                       <img
                         src={news.image_url}
                         alt={news.title}
@@ -138,9 +150,33 @@ const News: React.FC = () => {
                       <h3 className="text-3xl font-bold text-[#ca5231] mb-4 transform hover:translate-x-2 transition-transform font-['Swiss 721 Black Extended BT']">
                         {news.title}
                       </h3>
-                      <p className="text-xl text-[#ca5231]/80 transform hover:translate-y-[-2px] transition-transform font-['Rainy Days'] leading-relaxed">
-                        {news.description}
-                      </p>
+                      <div className={`relative overflow-hidden transition-all duration-500 ${
+                        isExpanded ? 'max-h-[500px]' : 'max-h-[100px]'
+                      }`}>
+                        <p className="text-xl text-[#ca5231]/80 transform hover:translate-y-[-2px] transition-transform font-['Rainy Days'] leading-relaxed">
+                          {news.description}
+                        </p>
+                        <div className={`absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#f6d9a0] to-transparent ${
+                          isExpanded ? 'hidden' : 'block'
+                        }`}></div>
+                      </div>
+                      <button 
+                        className="mt-4 inline-flex items-center text-[#ca5231] hover:text-[#ca5231]/80 transition-colors"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          toggleExpand(news.id);
+                        }}
+                      >
+                        {isExpanded ? (
+                          <>
+                            Voir moins <ChevronUp className="ml-1 w-4 h-4" />
+                          </>
+                        ) : (
+                          <>
+                            Lire la suite <ChevronDown className="ml-1 w-4 h-4" />
+                          </>
+                        )}
+                      </button>
                     </div>
                   </div>
                 </div>

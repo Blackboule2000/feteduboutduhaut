@@ -59,16 +59,13 @@ const Schedule: React.FC = () => {
   };
 
   // Séparation des concerts par catégorie
-  const mainConcerts = program.filter(concert => 
-    concert.title === "MOTOLO" || concert.title === "ARBAS"
-  ).sort((a, b) => a.title === "MOTOLO" ? -1 : 1);
-  
+  const motolo = program.find(concert => concert.title === "MOTOLO");
+  const arbas = program.find(concert => concert.title === "ARBAS");
   const otherConcerts = program.filter(concert => 
     concert.title !== "MOTOLO" && 
     concert.title !== "ARBAS" && 
     concert.title !== "Anna Rudy & Paul Lazarus"
   );
-  
   const afterParty = program.find(concert => concert.title === "Anna Rudy & Paul Lazarus");
 
   const AudioPlayer = ({ url }: { url: string | null }) => {
@@ -110,10 +107,10 @@ const Schedule: React.FC = () => {
     );
   };
 
-  const ConcertCard = ({ concert, isMain = false }: { concert: Program, isMain?: boolean }) => (
-    <div className={`relative group ${isMain ? 'transform hover:scale-102' : 'transform hover:scale-101'}`}>
+  const ConcertCard = ({ concert, isMain = false, isMotolo = false }: { concert: Program, isMain?: boolean, isMotolo?: boolean }) => (
+    <div className={`relative group ${isMotolo ? 'transform hover:scale-103' : isMain ? 'transform hover:scale-102' : 'transform hover:scale-101'}`}>
       <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
-      <div className="concert-card bg-[#f6d9a0] rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative h-full">
+      <div className={`concert-card bg-[#f6d9a0] rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative h-full ${isMotolo ? 'p-2' : ''}`}>
         <div className="absolute inset-0 border-[12px] border-[#ca5231]/20 rounded-xl pointer-events-none"></div>
         <div className="absolute inset-[12px] border-[3px] border-[#ca5231]/30 rounded-lg pointer-events-none"></div>
         
@@ -122,48 +119,69 @@ const Schedule: React.FC = () => {
         <div className="absolute bottom-0 left-0 w-16 h-16 border-b-8 border-l-8 border-[#ca5231]/40 rounded-bl-xl"></div>
         <div className="absolute bottom-0 right-0 w-16 h-16 border-b-8 border-r-8 border-[#ca5231]/40 rounded-br-xl"></div>
 
-        <div className="relative p-8 flex flex-col h-full">
-          <div className="flex justify-between items-start mb-6">
-            <div className="text-[#ca5231] text-2xl font-['Railroad Gothic'] bg-[#ca5231]/10 px-4 py-2 rounded-full">
-              {concert.time}
+        <div className={`relative p-8 flex flex-col h-full ${isMotolo ? 'md:flex-row md:gap-8' : ''}`}>
+          <div className={`flex flex-col ${isMotolo ? 'md:w-1/2' : 'w-full'}`}>
+            <div className="flex justify-between items-start mb-6">
+              <div className="text-[#ca5231] text-2xl font-['Railroad Gothic'] bg-[#ca5231]/10 px-4 py-2 rounded-full">
+                {concert.time}
+              </div>
+              <div className="flex items-center bg-[#ca5231]/10 px-4 py-2 rounded-full">
+                {concert.stage === "Grande Scène" ? (
+                  <Star className="w-5 h-5 text-[#ca5231] mr-2" />
+                ) : concert.stage === "Scène à Vélo" ? (
+                  <Bike className="w-5 h-5 text-[#ca5231] mr-2" />
+                ) : (
+                  <Music className="w-5 h-5 text-[#ca5231] mr-2" />
+                )}
+                <span className="text-lg text-[#ca5231] font-['Railroad Gothic']">
+                  {concert.stage}
+                </span>
+              </div>
             </div>
-            <div className="flex items-center bg-[#ca5231]/10 px-4 py-2 rounded-full">
-              {concert.stage === "Grande Scène" ? (
-                <Star className="w-5 h-5 text-[#ca5231] mr-2" />
-              ) : concert.stage === "Scène à Vélo" ? (
-                <Bike className="w-5 h-5 text-[#ca5231] mr-2" />
-              ) : (
-                <Music className="w-5 h-5 text-[#ca5231] mr-2" />
-              )}
-              <span className="text-lg text-[#ca5231] font-['Railroad Gothic']">
-                {concert.stage}
-              </span>
+
+            {concert.image_url && !isMotolo && (
+              <div className="relative aspect-video mb-6 overflow-hidden rounded-xl shadow-xl">
+                <div className="absolute inset-0 bg-[#ca5231]/10"></div>
+                <img 
+                  src={concert.image_url} 
+                  alt={concert.title}
+                  className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
+            )}
+
+            <h3 className={`font-['Swiss 721 Black Extended BT'] ${isMotolo ? 'text-5xl' : isMain ? 'text-4xl' : 'text-3xl'} text-[#ca5231] mb-4 text-center`}>
+              {concert.title}
+            </h3>
+
+            <p className={`font-['Rainy Days'] text-[#ca5231]/80 mb-6 ${isMotolo ? 'text-2xl' : 'text-xl'} ${isMotolo ? 'text-left' : 'text-center'} flex-grow`}>
+              {concert.description}
+            </p>
+
+            <div className="mt-auto">
+              <AudioPlayer url={concert.audio_url || null} />
             </div>
           </div>
 
-          {concert.image_url && (
-            <div className="relative aspect-video mb-6 overflow-hidden rounded-xl shadow-xl">
-              <div className="absolute inset-0 bg-[#ca5231]/10"></div>
-              <img 
-                src={concert.image_url} 
-                alt={concert.title}
-                className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
-              />
+          {isMotolo && concert.image_url && (
+            <div className="md:w-1/2 mt-6 md:mt-0">
+              <div className="relative aspect-video overflow-hidden rounded-xl shadow-xl mb-6">
+                <div className="absolute inset-0 bg-[#ca5231]/10"></div>
+                <img 
+                  src={concert.image_url} 
+                  alt={concert.title}
+                  className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+                />
+              </div>
+              <VideoPlayer url={concert.video_url} />
             </div>
           )}
 
-          <h3 className={`font-['Swiss 721 Black Extended BT'] ${isMain ? 'text-4xl' : 'text-3xl'} text-[#ca5231] mb-4 text-center`}>
-            {concert.title}
-          </h3>
-
-          <p className="font-['Rainy Days'] text-[#ca5231]/80 mb-6 text-xl text-center flex-grow">
-            {concert.description}
-          </p>
-
-          <div className="mt-auto">
-            <AudioPlayer url={concert.audio_url || null} />
-            <VideoPlayer url={concert.video_url} />
-          </div>
+          {!isMotolo && (
+            <div className="mt-4">
+              <VideoPlayer url={concert.video_url} />
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -198,14 +216,19 @@ const Schedule: React.FC = () => {
           </p>
         </div>
 
-        {/* Têtes d'affiche */}
-        <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 mb-16">
-          {mainConcerts.map((concert) => (
-            <div key={concert.id} className="flex-1 min-w-0 max-w-[600px]">
-              <ConcertCard concert={concert} isMain={true} />
-            </div>
-          ))}
-        </div>
+        {/* MOTOLO - Tête d'affiche principale */}
+        {motolo && (
+          <div className="mb-16 max-w-[1200px] mx-auto">
+            <ConcertCard concert={motolo} isMain={true} isMotolo={true} />
+          </div>
+        )}
+
+        {/* ARBAS - Deuxième tête d'affiche */}
+        {arbas && (
+          <div className="mb-16 max-w-[900px] mx-auto">
+            <ConcertCard concert={arbas} isMain={true} />
+          </div>
+        )}
 
         {/* Autres concerts */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">

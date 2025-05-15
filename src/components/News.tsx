@@ -25,11 +25,10 @@ const News: React.FC = () => {
     return () => clearInterval(timer);
   }, [newsData.length]);
 
-  // Move the Escape key handler outside of the conditional rendering
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        handleModalClose();
+        setSelectedNews(null);
       }
     };
 
@@ -64,14 +63,6 @@ const News: React.FC = () => {
     setCurrentIndex((prevIndex) => 
       prevIndex === 0 ? newsData.length - 1 : prevIndex - 1
     );
-  };
-
-  const handleNewsClick = (news: NewsItem) => {
-    setSelectedNews(news);
-  };
-
-  const handleModalClose = () => {
-    setSelectedNews(null);
   };
 
   if (loading) {
@@ -139,7 +130,7 @@ const News: React.FC = () => {
                     
                     <div 
                       className="polaroid-image relative h-[70%] overflow-hidden mb-6 group cursor-pointer"
-                      onClick={() => handleNewsClick(news)}
+                      onClick={() => setSelectedNews(news)}
                     >
                       <img
                         src={news.image_url}
@@ -211,7 +202,7 @@ const News: React.FC = () => {
       {selectedNews && (
         <div 
           className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={handleModalClose}
+          onClick={() => setSelectedNews(null)}
         >
           <div 
             className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
@@ -219,14 +210,14 @@ const News: React.FC = () => {
           >
             <div className="flex justify-between items-center absolute top-4 right-4 left-4 z-10">
               <button
-                onClick={handleModalClose}
+                onClick={() => setSelectedNews(null)}
                 className="flex items-center text-white hover:text-gray-200 transition-colors"
               >
                 <ArrowLeft className="w-6 h-6 mr-2" />
                 <span className="font-['Railroad Gothic']">Retour</span>
               </button>
               <button
-                onClick={handleModalClose}
+                onClick={() => setSelectedNews(null)}
                 className="text-white hover:text-gray-200"
               >
                 <X className="w-6 h-6" />

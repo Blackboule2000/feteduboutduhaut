@@ -86,7 +86,7 @@ const News: React.FC = () => {
       <div className="absolute inset-0 bg-noise opacity-20"></div>
       
       <div className="container mx-auto px-4 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-16">
+        <div className="text-center max-w-3xl mx-auto mb-8">
           <div className="vintage-button inline-block mb-4 bg-[#ca5231]/10 px-6 py-2 rounded-full">
             <span className="text-[#ca5231] font-['Railroad Gothic']">DERNIÈRES NOUVELLES</span>
           </div>
@@ -98,28 +98,27 @@ const News: React.FC = () => {
           </p>
         </div>
 
-        <div className="max-w-4xl mx-auto relative">
-          {/* Points de navigation en haut */}
-          <div className="flex justify-center space-x-2 mb-8">
-            {newsData.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => {
-                  setCurrentIndex(index);
-                  setExpandedId(null);
-                }}
-                className={`w-4 h-4 rounded-full transition-all duration-300 transform hover:scale-125 ${
-                  index === currentIndex 
-                    ? 'bg-[#ca5231] scale-110' 
-                    : 'bg-[#ca5231]/30 hover:bg-[#ca5231]/50'
-                }`}
-              />
-            ))}
-          </div>
+        {/* Points de navigation */}
+        <div className="flex justify-center space-x-2 mb-8">
+          {newsData.map((_, index) => (
+            <button
+              key={index}
+              onClick={() => {
+                setCurrentIndex(index);
+                setExpandedId(null);
+              }}
+              className={`w-4 h-4 rounded-full transition-all duration-300 transform hover:scale-125 ${
+                index === currentIndex 
+                  ? 'bg-[#ca5231] scale-110' 
+                  : 'bg-[#ca5231]/30 hover:bg-[#ca5231]/50'
+              }`}
+            />
+          ))}
+        </div>
 
-          <div className="relative h-[700px] overflow-visible">
+        <div className="max-w-4xl mx-auto relative">
+          <div className="relative min-h-[500px] max-h-[800px] overflow-hidden">
             {newsData.map((news, index) => {
-              const tapeRotation = Math.random() * 6 - 3;
               const isExpanded = expandedId === news.id;
               
               return (
@@ -127,62 +126,48 @@ const News: React.FC = () => {
                   key={news.id}
                   className={`absolute inset-0 transition-all duration-1000 transform ${
                     index === currentIndex 
-                      ? 'opacity-100 rotate-0 scale-100' 
+                      ? 'opacity-100 translate-x-0' 
                       : index < currentIndex
-                      ? 'opacity-0 -rotate-12 scale-90'
-                      : 'opacity-0 rotate-12 scale-90'
+                      ? 'opacity-0 -translate-x-full'
+                      : 'opacity-0 translate-x-full'
                   }`}
-                  style={{
-                    '--rotation': `${Math.random() * 3 - 1.5}deg`,
-                    '--tape-rotation': `${tapeRotation}deg`
-                  } as React.CSSProperties}
                 >
-                  <div 
-                    className={`polaroid-card transform hover:rotate-1 transition-all duration-500 bg-[#f6d9a0] cursor-pointer ${
-                      isExpanded ? 'scale-105' : ''
-                    }`}
-                  >
-                    <div className="tape tape-top"></div>
-                    <div className="tape tape-left"></div>
-                    <div className="tape tape-right"></div>
-                    
-                    <div className={`polaroid-image relative ${isExpanded ? 'h-[40%]' : 'h-[60%]'} overflow-hidden mb-6 transition-all duration-500`}>
+                  <div className="bg-white rounded-xl shadow-xl p-6 mx-4">
+                    <div className="relative aspect-video mb-6 overflow-hidden rounded-lg">
                       <img
                         src={news.image_url}
                         alt={news.title}
                         className="w-full h-full object-cover transform transition-transform duration-700 hover:scale-105"
-                        style={{
-                          animation: index === currentIndex ? 'subtle-zoom 20s infinite alternate' : 'none'
-                        }}
                       />
                     </div>
-                    <div className="text-center px-8 pb-8">
-                      <div className="polaroid-date mb-4 font-['Railroad Gothic'] text-xl">
+                    
+                    <div className="text-center">
+                      <div className="mb-4 text-lg text-[#ca5231]/80 font-['Railroad Gothic']">
                         {new Date(news.date).toLocaleDateString('fr-FR', {
                           day: 'numeric',
                           month: 'long',
                           year: 'numeric'
                         })}
                       </div>
-                      <h3 className="text-3xl font-bold text-[#ca5231] mb-4 transform hover:translate-x-2 transition-transform font-['Swiss 721 Black Extended BT']">
+                      
+                      <h3 className="text-2xl font-bold text-[#ca5231] mb-4 font-['Swiss 721 Black Extended BT']">
                         {news.title}
                       </h3>
+                      
                       <div className={`relative overflow-hidden transition-all duration-500 ${
-                        isExpanded ? 'max-h-[300px]' : 'max-h-[80px]'
+                        isExpanded ? 'max-h-[1000px]' : 'max-h-[100px]'
                       }`}>
-                        <p className="text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed">
+                        <p className="text-lg text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed">
                           {news.description}
                         </p>
-                        <div className={`absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#f6d9a0] to-transparent ${
-                          isExpanded ? 'hidden' : 'block'
-                        }`}></div>
+                        {!isExpanded && (
+                          <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
+                        )}
                       </div>
+                      
                       <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          toggleExpand(news.id);
-                        }}
-                        className="mt-4 inline-flex items-center px-6 py-2 bg-[#ca5231] text-white rounded-full hover:bg-[#ca5231]/80 transition-all duration-300 transform hover:scale-105 text-lg font-['Railroad Gothic'] shadow-lg"
+                        onClick={() => toggleExpand(news.id)}
+                        className="mt-4 inline-flex items-center px-6 py-3 bg-[#ca5231] text-white rounded-full hover:bg-[#ca5231]/80 transition-all duration-300 transform hover:scale-105"
                       >
                         {isExpanded ? (
                           <>
@@ -203,16 +188,16 @@ const News: React.FC = () => {
 
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-[#ca5231] text-white p-4 rounded-full z-30 transition-all duration-300 transform hover:scale-110 shadow-lg hover:bg-[#ca5231]/80"
+            className="absolute left-0 top-1/2 -translate-y-1/2 bg-[#ca5231] text-white p-4 rounded-full z-30 transition-all duration-300 transform hover:scale-110 hover:bg-[#ca5231]/80"
           >
-            <ChevronLeft className="w-8 h-8" />
+            <ChevronLeft className="w-6 h-6" />
           </button>
 
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#ca5231] text-white p-4 rounded-full z-30 transition-all duration-300 transform hover:scale-110 shadow-lg hover:bg-[#ca5231]/80"
+            className="absolute right-0 top-1/2 -translate-y-1/2 bg-[#ca5231] text-white p-4 rounded-full z-30 transition-all duration-300 transform hover:scale-110 hover:bg-[#ca5231]/80"
           >
-            <ChevronRight className="w-8 h-8" />
+            <ChevronRight className="w-6 h-6" />
           </button>
         </div>
       </div>

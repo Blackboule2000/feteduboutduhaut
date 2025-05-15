@@ -266,8 +266,15 @@ const Schedule: React.FC = () => {
           <div className="space-y-4">
             {program
               .sort((a, b) => {
-                const timeA = parseInt(a.time.split(':')[0]);
-                const timeB = parseInt(b.time.split(':')[0]);
+                // Convertir les heures en nombres pour la comparaison
+                const getTimeValue = (time: string) => {
+                  const hour = parseInt(time.split(':')[0]);
+                  // Si l'heure est 00:00, la considérer comme 24:00
+                  return hour === 0 ? 24 : hour;
+                };
+                
+                const timeA = getTimeValue(a.time);
+                const timeB = getTimeValue(b.time);
                 return timeA - timeB;
               })
               .map((concert) => (
@@ -292,6 +299,7 @@ const Schedule: React.FC = () => {
             }
           </div>
         </div>
+
       </div>
     </section>
   );

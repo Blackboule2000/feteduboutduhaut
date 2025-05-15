@@ -314,12 +314,12 @@ const Information: React.FC = () => {
                     href={partner.website_url || '#'} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="bg-white rounded-lg p-4 flex items-center justify-center h-32 transform hover:scale-105 transition-all duration-300 group shadow-md hover:shadow-lg"
+                    className="flex items-center justify-center h-32 transform hover:scale-105 transition-all duration-300"
                   >
                     <img 
                       src={partner.logo_url} 
                       alt={partner.name}
-                      className="max-h-24 w-auto filter group-hover:brightness-110 transition-all duration-300"
+                      className="max-h-24 w-auto filter hover:brightness-110 transition-all duration-300"
                     />
                   </a>
                 ))}

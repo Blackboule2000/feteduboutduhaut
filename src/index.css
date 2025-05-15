@@ -1,0 +1,219 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-festival-cream;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    height: 8px;
+    border-radius: 4px;
+    outline: none;
+  }
+
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    background: #ca5231;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s ease;
+  }
+
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.1);
+  }
+
+  input[type="range"]::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    background: #ca5231;
+    border-radius: 50%;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease;
+  }
+
+  input[type="range"]::-moz-range-thumb:hover {
+    transform: scale(1.1);
+  }
+}
+
+@layer components {
+  .timer-container {
+    @apply flex justify-center items-center gap-8 p-8;
+    background: #f6d9a0;
+    border-radius: 1rem;
+  }
+
+  .timer-unit {
+    @apply flex flex-col items-center justify-center;
+  }
+
+  circle {
+    transition: stroke-dashoffset 1s linear;
+  }
+
+  .polaroid-card {
+    background: #fff9e6;
+    padding: 1.5rem 1.5rem 2.5rem 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+    transform: rotate(var(--rotation, 0deg));
+    transition: all 0.3s ease;
+    position: relative;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .polaroid-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      45deg,
+      rgba(255, 249, 230, 0.4),
+      rgba(255, 255, 255, 0.6)
+    );
+    pointer-events: none;
+  }
+
+  .polaroid-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    height: 20px;
+    background: rgba(0, 0, 0, 0.08);
+    filter: blur(8px);
+    z-index: -1;
+  }
+
+  .tape {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.6);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    transform: rotate(var(--tape-rotation));
+    opacity: 0.8;
+    z-index: 10;
+  }
+
+  .tape-top {
+    width: 120px;
+    height: 30px;
+    top: -15px;
+    left: 50%;
+    transform: translateX(-50%) rotate(var(--tape-rotation));
+    background: linear-gradient(
+      to bottom,
+      rgba(255, 255, 255, 0.8),
+      rgba(255, 255, 255, 0.3)
+    );
+  }
+
+  .tape-left {
+    width: 40px;
+    height: 80px;
+    left: -20px;
+    top: 30%;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0.8),
+      rgba(255, 255, 255, 0.3)
+    );
+  }
+
+  .tape-right {
+    width: 40px;
+    height: 80px;
+    right: -20px;
+    top: 60%;
+    background: linear-gradient(
+      to left,
+      rgba(255, 255, 255, 0.8),
+      rgba(255, 255, 255, 0.3)
+    );
+  }
+
+  .polaroid-image {
+    position: relative;
+    background: #000;
+    padding: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .polaroid-image::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.2),
+      transparent 50%,
+      rgba(0, 0, 0, 0.1)
+    );
+    z-index: 2;
+    pointer-events: none;
+  }
+
+  .polaroid-date {
+    font-family: "Courier New", Courier, monospace;
+    background: #fff5d7;
+    border: 1px dashed rgba(202, 82, 49, 0.3);
+    color: rgba(202, 82, 49, 0.8);
+    padding: 0.25rem 0.75rem;
+    font-size: 0.875rem;
+    transform: rotate(-1deg);
+    display: inline-block;
+    box-shadow: 2px 2px 4px rgba(0, 0, 0, 0.05);
+  }
+}
+
+@keyframes subtle-zoom {
+  0% {
+    transform: scale(1);
+  }
+  100% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes floating {
+  0% {
+    transform: translateY(0px) rotate(-1deg);
+  }
+  50% {
+    transform: translateY(-8px) rotate(1deg);
+  }
+  100% {
+    transform: translateY(0px) rotate(-1deg);
+  }
+}
+
+@keyframes progress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+.floating-text {
+  animation: floating 3s ease-in-out infinite;
+  text-shadow: 2px 2px 4px rgba(202, 82, 49, 0.2);
+}

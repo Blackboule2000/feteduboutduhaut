@@ -1,0 +1,5 @@
+ALTER TABLE program
+ADD COLUMN IF NOT EXISTS video_url TEXT,
+ADD COLUMN IF NOT EXISTS audio_url TEXT,
+ADD COLUMN IF NOT EXISTS gallery_urls JSONB DEFAULT '[]'::jsonb,
+ADD COLUMN IF NOT EXISTS background_image TEXT;

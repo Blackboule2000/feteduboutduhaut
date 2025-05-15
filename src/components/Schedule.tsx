@@ -40,26 +40,23 @@ const Schedule: React.FC = () => {
     }
   };
 
-  // Artistes principaux (têtes d'affiche)
-  const headliners = program.filter(concert => 
-    concert.title === "MOTOLO" || concert.title === "Arbas"
-  );
-
-  // Autres concerts de la journée
-  const dayConcerts = program.filter(concert => 
-    concert.title !== "MOTOLO" && 
-    concert.title !== "Arbas" && 
-    concert.title !== "Anna Rudy & Paul Lazarus"
-  ).sort((a, b) => {
-    const timeA = parseInt(a.time.split(':')[0]);
-    const timeB = parseInt(b.time.split(':')[0]);
-    return timeA - timeB;
-  });
-
-  // After party
-  const afterParty = program.find(concert => 
-    concert.title === "Anna Rudy & Paul Lazarus"
-  );
+  // Séparation des concerts par catégorie
+  const motolo = program.find(concert => concert.title === "MOTOLO");
+  const arbas = program.find(concert => concert.title === "Arbas");
+  const afterParty = program.find(concert => concert.title === "Anna Rudy & Paul Lazarus");
+  
+  // Autres concerts triés par horaire
+  const dayConcerts = program
+    .filter(concert => 
+      concert.title !== "MOTOLO" && 
+      concert.title !== "Arbas" && 
+      concert.title !== "Anna Rudy & Paul Lazarus"
+    )
+    .sort((a, b) => {
+      const timeA = parseInt(a.time.split(':')[0]);
+      const timeB = parseInt(b.time.split(':')[0]);
+      return timeA - timeB;
+    });
 
   const AudioPlayer = ({ url }: { url: string | null }) => {
     if (!url) return null;
@@ -98,38 +95,100 @@ const Schedule: React.FC = () => {
     );
   };
 
-  const TimelineItem = ({ time }: { time: string }) => {
-    const isSelected = selectedTime === time;
-    const concerts = program.filter(c => c.time === time);
-    
-    return (
-      <div 
-        className={`cursor-pointer transition-all duration-300 ${
-          isSelected ? 'scale-105' : ''
-        }`}
-        onClick={() => setSelectedTime(isSelected ? null : time)}
-      >
-        <div className="flex items-center space-x-2">
-          <Clock className="w-5 h-5 text-[#ca5231]" />
-          <span className="text-lg font-['Railroad Gothic'] text-[#ca5231]">
-            {time}
-          </span>
-        </div>
-        {isSelected && (
-          <div className="mt-2 space-y-2">
-            {concerts.map(concert => (
-              <div 
-                key={concert.id}
-                className="text-sm text-[#ca5231]/80 pl-7"
-              >
-                {concert.title} - {concert.stage}
+  const MainArtistCard = ({ concert }: { concert: Program }) => (
+    <div className="relative group transform transition-all duration-500 hover:scale-105">
+      <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
+      <div className="bg-[#f6d9a0] rounded-xl overflow-hidden relative">
+        <div className="absolute inset-0 border-[12px] border-[#ca5231]/20 rounded-xl"></div>
+        
+        {concert.image_url && (
+          <div className="relative aspect-[21/9] overflow-hidden">
+            <img 
+              src={concert.image_url}
+              alt={concert.title}
+              className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+            <div className="absolute bottom-0 left-0 right-0 p-8">
+              <div className="flex items-center space-x-4 mb-4">
+                <div className="bg-[#ca5231] p-3 rounded-full">
+                  <Star className="h-6 w-6 text-white" />
+                </div>
+                <span className="text-3xl text-white font-['Railroad Gothic']">
+                  {concert.time}
+                </span>
+                <span className="text-2xl text-white/80 font-['Rainy Days']">
+                  {concert.stage}
+                </span>
               </div>
-            ))}
+              <h3 className="text-5xl md:text-6xl text-white font-['Swiss 721 Black Extended BT'] mb-4">
+                {concert.title}
+              </h3>
+            </div>
           </div>
         )}
+        
+        <div className="p-8">
+          <p className="text-2xl text-[#ca5231]/80 font-['Rainy Days'] mb-6 leading-relaxed">
+            {concert.description}
+          </p>
+          <AudioPlayer url={concert.audio_url} />
+          <VideoPlayer url={concert.video_url} />
+        </div>
       </div>
-    );
-  };
+    </div>
+  );
+
+  const ConcertCard = ({ concert }: { concert: Program }) => (
+    <div className="transform transition-all duration-500 hover:scale-102">
+      <div className="relative group">
+        <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
+        <div className="bg-[#f6d9a0] rounded-xl overflow-hidden relative h-full">
+          <div className="absolute inset-0 border-[8px] border-[#ca5231]/20 rounded-xl"></div>
+          
+          {concert.image_url && (
+            <div className="relative aspect-video overflow-hidden">
+              <img 
+                src={concert.image_url}
+                alt={concert.title}
+                className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+            </div>
+          )}
+          
+          <div className="p-6">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center space-x-2">
+                {concert.stage === "Scène à Vélo" ? (
+                  <Bike className="h-5 w-5 text-[#ca5231]" />
+                ) : (
+                  <Music className="h-5 w-5 text-[#ca5231]" />
+                )}
+                <span className="text-lg font-['Railroad Gothic'] text-[#ca5231]">
+                  {concert.time}
+                </span>
+              </div>
+              <span className="text-sm font-['Rainy Days'] text-[#ca5231]/80">
+                {concert.stage}
+              </span>
+            </div>
+            
+            <h3 className="text-2xl font-['Swiss 721 Black Extended BT'] text-[#ca5231] mb-4">
+              {concert.title}
+            </h3>
+            
+            <p className="text-lg text-[#ca5231]/80 font-['Rainy Days'] mb-6">
+              {concert.description}
+            </p>
+            
+            <AudioPlayer url={concert.audio_url} />
+            <VideoPlayer url={concert.video_url} />
+          </div>
+        </div>
+      </div>
+    </div>
+  );
 
   if (loading) {
     return (
@@ -140,12 +199,6 @@ const Schedule: React.FC = () => {
       </section>
     );
   }
-
-  const uniqueTimes = [...new Set(program.map(p => p.time))].sort((a, b) => {
-    const timeA = parseInt(a.split(':')[0]);
-    const timeB = parseInt(b.split(':')[0]);
-    return timeA - timeB;
-  });
 
   return (
     <section id="programme" className="relative py-20 bg-festival-turquoise overflow-hidden">
@@ -166,183 +219,77 @@ const Schedule: React.FC = () => {
           </p>
         </div>
 
-        {/* Têtes d'affiche */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-          {headliners.map((concert, index) => (
-            <div 
-              key={concert.id}
-              className={`transform transition-all duration-500 hover:scale-105 ${
-                index === 0 ? 'md:col-span-2' : ''
-              }`}
-            >
-              <div className="relative group">
-                <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
-                <div className="bg-[#f6d9a0] rounded-xl overflow-hidden relative">
-                  <div className="absolute inset-0 border-[12px] border-[#ca5231]/20 rounded-xl"></div>
-                  
-                  {concert.image_url && (
-                    <div className="relative aspect-video overflow-hidden">
-                      <img 
-                        src={concert.image_url}
-                        alt={concert.title}
-                        className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                      <div className="absolute bottom-0 left-0 right-0 p-8">
-                        <div className="flex items-center space-x-4 mb-4">
-                          <div className="bg-[#ca5231] p-3 rounded-full">
-                            <Star className="h-6 w-6 text-white" />
-                          </div>
-                          <span className="text-2xl text-white font-['Railroad Gothic']">
-                            {concert.time}
-                          </span>
-                          <span className="text-xl text-white/80 font-['Rainy Days']">
-                            {concert.stage}
-                          </span>
-                        </div>
-                        <h3 className="text-4xl md:text-5xl text-white font-['Swiss 721 Black Extended BT'] mb-4">
-                          {concert.title}
-                        </h3>
-                      </div>
-                    </div>
-                  )}
-                  
-                  <div className="p-8">
-                    <p className="text-xl text-[#ca5231]/80 font-['Rainy Days'] mb-6">
-                      {concert.description}
-                    </p>
-                    <AudioPlayer url={concert.audio_url} />
-                    <VideoPlayer url={concert.video_url} />
-                  </div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
+        {/* MOTOLO - Tête d'affiche principale */}
+        {motolo && (
+          <div className="mb-16">
+            <MainArtistCard concert={motolo} />
+          </div>
+        )}
 
-        {/* Programme de la journée */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+        {/* ARBAS - Deuxième tête d'affiche */}
+        {arbas && (
+          <div className="max-w-4xl mx-auto mb-16">
+            <MainArtistCard concert={arbas} />
+          </div>
+        )}
+
+        {/* Concerts de la journée */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {dayConcerts.map((concert) => (
-            <div 
-              key={concert.id}
-              className="transform transition-all duration-500 hover:scale-102"
-            >
-              <div className="relative group">
-                <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
-                <div className="bg-[#f6d9a0] rounded-xl overflow-hidden relative h-full">
-                  <div className="absolute inset-0 border-[8px] border-[#ca5231]/20 rounded-xl"></div>
-                  
-                  {concert.image_url && (
-                    <div className="relative aspect-video overflow-hidden">
-                      <img 
-                        src={concert.image_url}
-                        alt={concert.title}
-                        className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                    </div>
-                  )}
-                  
-                  <div className="p-6">
-                    <div className="flex items-center justify-between mb-4">
-                      <div className="flex items-center space-x-2">
-                        {concert.stage === "Scène à Vélo" ? (
-                          <Bike className="h-5 w-5 text-[#ca5231]" />
-                        ) : (
-                          <Music className="h-5 w-5 text-[#ca5231]" />
-                        )}
-                        <span className="text-lg font-['Railroad Gothic'] text-[#ca5231]">
-                          {concert.time}
-                        </span>
-                      </div>
-                      <span className="text-sm font-['Rainy Days'] text-[#ca5231]/80">
-                        {concert.stage}
-                      </span>
-                    </div>
-                    
-                    <h3 className="text-2xl font-['Swiss 721 Black Extended BT'] text-[#ca5231] mb-4">
-                      {concert.title}
-                    </h3>
-                    
-                    <p className="text-lg text-[#ca5231]/80 font-['Rainy Days'] mb-6">
-                      {concert.description}
-                    </p>
-                    
-                    <AudioPlayer url={concert.audio_url} />
-                    <VideoPlayer url={concert.video_url} />
-                  </div>
-                </div>
-              </div>
-            </div>
+            <ConcertCard key={concert.id} concert={concert} />
           ))}
         </div>
 
         {/* After Party */}
         {afterParty && (
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-3xl mx-auto mt-20">
             <div className="text-center mb-8">
+              <div className="inline-block bg-[#f6d9a0] text-[#ca5231] py-2 px-6 rounded-full mb-4">
+                <span className="font-['Railroad Gothic'] text-xl">AFTER PARTY</span>
+              </div>
               <h3 className="font-['Swiss 721 Black Extended BT'] text-3xl text-[#f6d9a0] mb-2">
-                AFTER PARTY
+                LA FÊTE CONTINUE
               </h3>
               <p className="text-xl text-[#f6d9a0]/90 font-['Rainy Days']">
-                Pour continuer la fête jusqu'au bout de la nuit
+                Pour danser jusqu'au bout de la nuit
               </p>
             </div>
-            
-            <div className="relative group transform transition-all duration-500 hover:scale-102">
-              <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
-              <div className="bg-[#f6d9a0] rounded-xl overflow-hidden relative">
-                <div className="absolute inset-0 border-[8px] border-[#ca5231]/20 rounded-xl"></div>
-                
-                {afterParty.image_url && (
-                  <div className="relative aspect-video overflow-hidden">
-                    <img 
-                      src={afterParty.image_url}
-                      alt={afterParty.title}
-                      className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                  </div>
-                )}
-                
-                <div className="p-8">
-                  <div className="flex items-center justify-between mb-4">
-                    <div className="flex items-center space-x-2">
-                      <Music className="h-5 w-5 text-[#ca5231]" />
-                      <span className="text-lg font-['Railroad Gothic'] text-[#ca5231]">
-                        {afterParty.time}
-                      </span>
-                    </div>
-                    <span className="text-sm font-['Rainy Days'] text-[#ca5231]/80">
-                      {afterParty.stage}
-                    </span>
-                  </div>
-                  
-                  <h3 className="text-2xl font-['Swiss 721 Black Extended BT'] text-[#ca5231] mb-4">
-                    {afterParty.title}
-                  </h3>
-                  
-                  <p className="text-lg text-[#ca5231]/80 font-['Rainy Days'] mb-6">
-                    {afterParty.description}
-                  </p>
-                  
-                  <AudioPlayer url={afterParty.audio_url} />
-                  <VideoPlayer url={afterParty.video_url} />
-                </div>
-              </div>
-            </div>
+            <ConcertCard concert={afterParty} />
           </div>
         )}
 
-        {/* Timeline */}
-        <div className="mt-16 bg-[#f6d9a0]/90 backdrop-blur-sm rounded-xl p-8 max-w-3xl mx-auto">
+        {/* Timeline des concerts */}
+        <div className="mt-20 bg-[#f6d9a0]/90 backdrop-blur-sm rounded-xl p-8 max-w-3xl mx-auto">
           <h3 className="text-center font-['Swiss 721 Black Extended BT'] text-3xl mb-8 text-[#ca5231]">
             HORAIRES DES CONCERTS
           </h3>
-          <div className="space-y-6">
-            {uniqueTimes.map((time) => (
-              <TimelineItem key={time} time={time} />
-            ))}
+          <div className="space-y-4">
+            {program
+              .sort((a, b) => {
+                const timeA = parseInt(a.time.split(':')[0]);
+                const timeB = parseInt(b.time.split(':')[0]);
+                return timeA - timeB;
+              })
+              .map((concert) => (
+                <div 
+                  key={concert.id}
+                  className="flex items-center justify-between p-4 hover:bg-white/30 rounded-lg transition-colors duration-300"
+                >
+                  <div className="flex items-center space-x-4">
+                    <Clock className="w-5 h-5 text-[#ca5231]" />
+                    <span className="text-xl font-['Railroad Gothic'] text-[#ca5231]">
+                      {concert.time}
+                    </span>
+                    <span className="text-2xl font-['Swiss 721 Black Extended BT'] text-[#ca5231]">
+                      {concert.title}
+                    </span>
+                  </div>
+                  <span className="text-lg text-[#ca5231]/80 font-['Rainy Days']">
+                    {concert.stage}
+                  </span>
+                </div>
+              ))
+            }
           </div>
         </div>
       </div>

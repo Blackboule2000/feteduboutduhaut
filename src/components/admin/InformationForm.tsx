@@ -106,9 +106,11 @@ const InformationForm: React.FC = () => {
         .from('settings')
         .select('value')
         .eq('key', 'information_settings')
-        .single();
+        .maybeSingle();
 
-      if (error) {
+      if (error) throw error;
+
+      if (!data) {
         // If no data exists, create it with default settings
         const { error: upsertError } = await supabase
           .from('settings')
@@ -119,7 +121,7 @@ const InformationForm: React.FC = () => {
 
         if (upsertError) throw upsertError;
         setSettings(defaultSettings);
-      } else if (data) {
+      } else {
         setSettings(data.value);
       }
     } catch (err) {

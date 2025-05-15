@@ -83,9 +83,11 @@ const HeaderForm: React.FC = () => {
         .from('settings')
         .select('value')
         .eq('key', 'header_settings')
-        .single();
+        .maybeSingle();
 
-      if (error) {
+      if (error) throw error;
+
+      if (!data) {
         // If no data exists, create it with default settings
         const { error: upsertError } = await supabase
           .from('settings')

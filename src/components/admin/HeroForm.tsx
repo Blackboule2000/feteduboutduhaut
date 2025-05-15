@@ -54,11 +54,14 @@ const HeroForm: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('settings')
-        .select('*')
+        .select('value')
         .eq('key', 'hero_settings')
         .maybeSingle();
 
-      if (error) {
+      if (error) throw error;
+
+      if (!data) {
+        // If no data exists, create it with default settings
         const { error: upsertError } = await supabase
           .from('settings')
           .upsert({
@@ -68,7 +71,7 @@ const HeroForm: React.FC = () => {
 
         if (upsertError) throw upsertError;
         setSettings(defaultSettings);
-      } else if (data) {
+      } else {
         // Ensure all required properties exist by merging with defaultSettings
         setSettings({ ...defaultSettings, ...data.value });
       }

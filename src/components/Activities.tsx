@@ -1,7 +1,51 @@
-import React from 'react';
-import { activityData, getIcon } from '../data';
+import React, { useEffect, useState } from 'react';
+import { getIcon } from '../data';
+import { supabase } from '../lib/supabase';
+
+interface Activity {
+  id: string;
+  name: string;
+  time: string;
+  description: string;
+  icon: string;
+  image_url?: string;
+  order_index: number;
+}
 
 const Activities: React.FC = () => {
+  const [activities, setActivities] = useState<Activity[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadActivities();
+  }, []);
+
+  const loadActivities = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('activities')
+        .select('*')
+        .order('order_index', { ascending: true });
+
+      if (error) throw error;
+      if (data) setActivities(data);
+    } catch (err) {
+      console.error('Erreur lors du chargement des activités:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section id="activites" className="relative py-20 bg-[#f6d9a0] overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="text-center">Chargement des activités...</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section id="activites" className="relative py-20 bg-[#f6d9a0] overflow-hidden">
       <div className="absolute inset-0 bg-retro-pattern opacity-10"></div>
@@ -21,7 +65,7 @@ const Activities: React.FC = () => {
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
-          {activityData.map((activity) => {
+          {activities.map((activity) => {
             const IconComponent = getIcon(activity.icon);
             
             return (
@@ -42,11 +86,11 @@ const Activities: React.FC = () => {
                   <div className="absolute bottom-0 right-0 w-12 h-12 border-b-4 border-r-4 border-[#ca5231]/40 rounded-br-xl"></div>
 
                   <div className="relative p-6">
-                    {activity.image && (
+                    {activity.image_url && (
                       <div className="relative aspect-video mb-6 overflow-hidden rounded-xl shadow-xl">
                         <div className="absolute inset-0 bg-[#ca5231]/10"></div>
                         <img 
-                          src={activity.image} 
+                          src={activity.image_url} 
                           alt={activity.name}
                           className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
                         />

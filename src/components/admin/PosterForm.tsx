@@ -9,7 +9,7 @@ interface PosterSettings {
 }
 
 const defaultSettings: PosterSettings = {
-  image_url: 'http://www.image-heberg.fr/files/17472124523185540990.jpg',
+  image_url: 'https://i.ibb.co/FL3xY1gP/FDBH-2025-R-cup-r-R-cup-r-R-cup-r.jpg',
   alt_text: 'Affiche Fête du Bout du Haut 2025',
   enabled: true
 };
@@ -27,7 +27,9 @@ const PosterForm: React.FC = () => {
 
   useEffect(() => {
     // Mettre à jour la prévisualisation quand l'URL change
-    setPreview(settings.image_url);
+    if (settings.image_url) {
+      setPreview(settings.image_url);
+    }
   }, [settings.image_url]);
 
   const loadSettings = async () => {
@@ -62,9 +64,12 @@ const PosterForm: React.FC = () => {
   };
 
   const validateImageUrl = async (url: string): Promise<boolean> => {
+    if (!url) return false;
+    
     try {
-      const response = await fetch(url, { method: 'HEAD' });
-      return response.ok && response.headers.get('content-type')?.startsWith('image/');
+      const response = await fetch(url);
+      const contentType = response.headers.get('content-type');
+      return response.ok && (contentType?.startsWith('image/') || false);
     } catch {
       return false;
     }
@@ -97,14 +102,16 @@ const PosterForm: React.FC = () => {
     } catch (err) {
       console.error('Erreur lors de l\'enregistrement:', err);
       setError(err instanceof Error ? err.message : 'Erreur lors de l\'enregistrement des paramètres');
+      // En cas d'erreur, revenir à l'URL par défaut pour la prévisualisation
+      setPreview(defaultSettings.image_url);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const newUrl = e.target.value;
-    setSettings({ ...settings, image_url: newUrl });
+  const handleImageError = () => {
+    setPreview(defaultSettings.image_url);
+    setError("L'image n'a pas pu être chargée. Vérifiez l'URL.");
   };
 
   return (
@@ -130,7 +137,7 @@ const PosterForm: React.FC = () => {
             <input
               type="url"
               value={settings.image_url}
-              onChange={handleImageUrlChange}
+              onChange={(e) => setSettings({ ...settings, image_url: e.target.value })}
               className="w-full px-4 py-2 border border-yellow-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500"
               placeholder="https://..."
               required
@@ -140,8 +147,8 @@ const PosterForm: React.FC = () => {
                 <img
                   src={preview}
                   alt="Aperçu de l'affiche"
-                  className="w-full h-full object-cover rounded-lg shadow-lg"
-                  onError={() => setPreview(defaultSettings.image_url)}
+                  className="w-full h-full object-contain rounded-lg shadow-lg"
+                  onError={handleImageError}
                 />
               </div>
             )}

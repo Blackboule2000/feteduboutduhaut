@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface NewsItem {
@@ -14,6 +14,7 @@ const News: React.FC = () => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [newsData, setNewsData] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
 
   useEffect(() => {
     loadNews();
@@ -49,7 +50,6 @@ const News: React.FC = () => {
   };
 
   useEffect(() => {
-    // Augmentation de l'intervalle à 8000ms (8 secondes)
     const timer = setInterval(nextSlide, 8000);
     return () => clearInterval(timer);
   }, [newsData.length]);
@@ -117,15 +117,23 @@ const News: React.FC = () => {
                     <div className="tape tape-left"></div>
                     <div className="tape tape-right"></div>
                     
-                    <div className="polaroid-image relative h-[70%] overflow-hidden mb-6">
+                    <div className="polaroid-image relative h-[70%] overflow-hidden mb-6 group">
                       <img
                         src={news.image_url}
                         alt={news.title}
-                        className="w-full h-full object-cover transform transition-transform duration-700 hover:scale-105"
+                        className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
                         style={{
                           animation: index === currentIndex ? 'subtle-zoom 20s infinite alternate' : 'none'
                         }}
                       />
+                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                        <button
+                          onClick={() => setSelectedNews(news)}
+                          className="bg-[#ca5231] text-white px-6 py-3 rounded-full transform -translate-y-4 group-hover:translate-y-0 transition-all duration-300 font-['Railroad Gothic'] text-lg hover:bg-[#ca5231]/80"
+                        >
+                          En savoir plus
+                        </button>
+                      </div>
                     </div>
                     <div className="text-center px-8">
                       <div className="polaroid-date mb-4 font-['Railroad Gothic'] text-xl">
@@ -139,7 +147,9 @@ const News: React.FC = () => {
                         {news.title}
                       </h3>
                       <p className="text-xl text-[#ca5231]/80 transform hover:translate-y-[-2px] transition-transform font-['Rainy Days'] leading-relaxed">
-                        {news.description}
+                        {news.description.length > 150 
+                          ? `${news.description.substring(0, 150)}...` 
+                          : news.description}
                       </p>
                     </div>
                   </div>
@@ -177,6 +187,48 @@ const News: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Modal */}
+      {selectedNews && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+            <button
+              onClick={() => setSelectedNews(null)}
+              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10"
+            >
+              <X className="w-6 h-6" />
+            </button>
+            
+            <div className="aspect-video w-full">
+              <img
+                src={selectedNews.image_url}
+                alt={selectedNews.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+            
+            <div className="p-8">
+              <div className="font-['Railroad Gothic'] text-lg text-[#ca5231]/80 mb-2">
+                {new Date(selectedNews.date).toLocaleDateString('fr-FR', {
+                  day: 'numeric',
+                  month: 'long',
+                  year: 'numeric'
+                })}
+              </div>
+              
+              <h3 className="text-2xl font-bold text-[#ca5231] mb-4 font-['Swiss 721 Black Extended BT']">
+                {selectedNews.title}
+              </h3>
+              
+              <div className="prose prose-lg">
+                <p className="text-lg text-gray-700 font-['Rainy Days'] leading-relaxed whitespace-pre-line">
+                  {selectedNews.description}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </section>
   );
 };

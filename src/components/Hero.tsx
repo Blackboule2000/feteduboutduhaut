@@ -2,48 +2,24 @@ import React, { useEffect, useState } from 'react';
 import FlipTimer from './FlipTimer';
 import { supabase } from '../lib/supabase';
 
-interface HomeSettings {
-  main_image: {
-    url: string;
-    alt: string;
-  };
-  poster?: {
-    url: string;
-    alt: string;
-  };
-  countdown: {
-    enabled: boolean;
-    date: string;
-    time: string;
-  };
-  birds?: {
-    enabled: boolean;
-    quantity: number;
-  };
+interface HeroSettings {
+  title: string;
+  subtitle: string;
+  date: string;
+  main_image: string;
+  poster_image: string;
+  background_color: string;
 }
 
-const defaultSettings: HomeSettings = {
-  main_image: {
-    url: 'http://www.image-heberg.fr/files/1747215665990305646.png',
-    alt: 'Logo Fête du Bout du Haut'
-  },
-  poster: {
-    url: 'http://www.image-heberg.fr/files/17472124523185540990.jpg',
-    alt: 'Affiche Fête du Bout du Haut 2025'
-  },
-  countdown: {
-    enabled: true,
-    date: '2025-07-26',
-    time: '11:00'
-  },
-  birds: {
-    enabled: true,
-    quantity: 6
-  }
-};
-
 const Hero: React.FC = () => {
-  const [settings, setSettings] = useState<HomeSettings>(defaultSettings);
+  const [settings, setSettings] = useState<HeroSettings>({
+    title: 'Fête du Bout du Haut',
+    subtitle: 'Festival Musical et Culturel',
+    date: '26 Juillet 2025',
+    main_image: 'http://www.image-heberg.fr/files/1747215665990305646.png',
+    poster_image: 'http://www.image-heberg.fr/files/17472124523185540990.jpg',
+    background_color: '#f6d9a0'
+  });
 
   useEffect(() => {
     loadSettings();
@@ -51,12 +27,14 @@ const Hero: React.FC = () => {
 
   const loadSettings = async () => {
     try {
-      const { data } = await supabase
+      const { data, error } = await supabase
         .from('settings')
         .select('value')
-        .eq('key', 'home_settings')
+        .eq('key', 'hero_settings')
+        .limit(1)
         .maybeSingle();
 
+      if (error) throw error;
       if (data?.value) {
         setSettings(data.value);
       }
@@ -65,51 +43,60 @@ const Hero: React.FC = () => {
     }
   };
 
-  const renderBirds = (quantity: number) => {
-    const birds = [];
-    for (let i = 0; i < quantity; i++) {
-      birds.push(
-        <div 
-          key={i}
-          className="absolute transform"
-          style={{
-            top: `${Math.random() * 100}%`,
-            left: `${Math.random() * 100}%`,
-            rotate: `${Math.random() * 360}deg`,
-            opacity: 0.2 + Math.random() * 0.3
-          }}
-        >
-          <img 
-            src="http://www.image-heberg.fr/files/17472137482209719273.png" 
-            alt="Hirondelle décorative" 
-            className="w-8 h-auto"
-          />
-        </div>
-      );
-    }
-    return birds;
-  };
-
   return (
     <section 
       id="accueil" 
-      className="relative min-h-screen overflow-hidden bg-[#f6d9a0]"
+      className="relative min-h-screen overflow-hidden"
+      style={{ backgroundColor: settings.background_color }}
     >
       <div className="absolute inset-0 bg-retro-pattern opacity-10"></div>
       <div className="absolute inset-0 bg-noise opacity-20"></div>
       
-      {settings.birds?.enabled && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {renderBirds(settings.birds?.quantity ?? 6)}
-        </div>
-      )}
+      {/* Hirondelles dans le fond - Couche 1 */}
+      <div className="absolute top-1/6 left-1/6 transform rotate-12">
+        <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-8 h-auto" style={{ opacity: 0.3 }} />
+      </div>
+      <div className="absolute top-1/4 right-1/5 transform -rotate-12">
+        <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-6 h-auto" style={{ opacity: 0.2 }} />
+      </div>
+      <div className="absolute bottom-1/3 left-1/4 transform rotate-45">
+        <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-10 h-auto" style={{ opacity: 0.25 }} />
+      </div>
       
-      <div className="relative w-full pt-32 pb-24">
+      {/* Hirondelles dans le fond - Couche 2 */}
+      <div className="absolute top-1/3 left-1/3 transform -rotate-15">
+        <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-7 h-auto" style={{ opacity: 0.15 }} />
+      </div>
+      <div className="absolute top-2/3 right-1/4 transform rotate-30">
+        <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-5 h-auto" style={{ opacity: 0.2 }} />
+      </div>
+      <div className="absolute bottom-1/4 left-1/5 transform -rotate-25">
+        <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-9 h-auto" style={{ opacity: 0.3 }} />
+      </div>
+
+      {/* Title Section with Enlarged Image */}
+      <div className="relative w-full pt-32 pb-24" style={{ backgroundColor: settings.background_color }}>
         <div className="container mx-auto px-4">
           <div className="text-center relative">
+            {/* Hirondelles autour du titre - Gauche */}
+            <div className="absolute -left-4 top-1/4 transform -rotate-12">
+              <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-8 h-auto" style={{ opacity: 0.7 }} />
+            </div>
+            <div className="absolute left-1/4 -top-8 transform rotate-25">
+              <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-6 h-auto" style={{ opacity: 0.6 }} />
+            </div>
+            
+            {/* Hirondelles autour du titre - Droite */}
+            <div className="absolute -right-4 top-1/3 transform rotate-12">
+              <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-8 h-auto" style={{ opacity: 0.7 }} />
+            </div>
+            <div className="absolute right-1/4 -top-6 transform -rotate-25">
+              <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-6 h-auto" style={{ opacity: 0.6 }} />
+            </div>
+            
             <img 
-              src={settings.main_image.url}
-              alt={settings.main_image.alt}
+              src={settings.main_image}
+              alt={settings.title}
               className="mx-auto mb-8 w-[1000px] max-w-full h-auto"
               style={{ 
                 filter: 'brightness(1.1) saturate(0.85) contrast(0.9)',
@@ -120,30 +107,43 @@ const Hero: React.FC = () => {
         </div>
       </div>
 
-      {settings.countdown.enabled && (
-        <div className="relative z-20 -mt-8 mb-12">
-          <div className="max-w-4xl mx-auto px-4">
-            <div className="bg-[#f6d9a0] rounded-xl p-6">
-              <h2 className="floating-text text-center font-['Swiss 721 Black Extended BT'] text-4xl md:text-5xl text-[#ca5231] mb-8 tracking-wider font-bold">
-                RENDEZ-VOUS DANS
-              </h2>
-              <FlipTimer targetDate={new Date(`${settings.countdown.date}T${settings.countdown.time}`)} />
-            </div>
+      {/* Timer Section */}
+      <div className="relative z-20 -mt-8 mb-12">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="bg-[#f6d9a0] rounded-xl p-6">
+            <h2 className="floating-text text-center font-['Swiss 721 Black Extended BT'] text-4xl md:text-5xl text-[#ca5231] mb-8 tracking-wider font-bold">
+              RENDEZ-VOUS DANS
+            </h2>
+            <FlipTimer targetDate={new Date("Jul 26, 2025 11:00:00")} />
           </div>
         </div>
-      )}
+      </div>
 
-      {settings.poster && (
-        <div className="container mx-auto px-4 z-10">
-          <div className="max-w-4xl mx-auto relative">
-            <img 
-              src={settings.poster.url}
-              alt={settings.poster.alt}
-              className="w-full h-auto rounded-lg shadow-2xl mb-12"
-            />
+      {/* Main Content */}
+      <div className="container mx-auto px-4 z-10">
+        {/* Poster Section */}
+        <div className="max-w-4xl mx-auto relative">
+          {/* Hirondelles autour de l'affiche - Nouvelles positions */}
+          <div className="absolute -top-12 -left-16 transform rotate-25">
+            <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-10 h-auto" style={{ opacity: 0.8 }} />
           </div>
+          <div className="absolute top-1/6 -right-20 transform -rotate-15">
+            <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-8 h-auto" style={{ opacity: 0.7 }} />
+          </div>
+          <div className="absolute bottom-1/4 -left-24 transform rotate-45">
+            <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-12 h-auto" style={{ opacity: 0.9 }} />
+          </div>
+          <div className="absolute -bottom-8 right-1/4 transform -rotate-30">
+            <img src="http://www.image-heberg.fr/files/17472137482209719273.png" alt="Hirondelle" className="w-9 h-auto" style={{ opacity: 0.8 }} />
+          </div>
+          
+          <img 
+            src={settings.poster_image}
+            alt={`Affiche ${settings.title}`}
+            className="w-full h-auto rounded-lg shadow-2xl mb-12"
+          />
         </div>
-      )}
+      </div>
     </section>
   );
 };

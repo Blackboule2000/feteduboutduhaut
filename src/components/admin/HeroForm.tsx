@@ -56,7 +56,7 @@ const HeroForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadLoading, setUploadLoading] = useState<{ main: boolean; poster: boolean }>({
+  const [uploadLoading, setUploadLoading] = useState({
     main: false,
     poster: false
   });
@@ -69,11 +69,18 @@ const HeroForm: React.FC = () => {
     try {
       const { data, error } = await supabase
         .from('settings')
-        .select('value')
+        .select('*')
         .eq('key', 'hero_settings')
         .maybeSingle();
 
       if (error) {
+        throw error;
+      }
+
+      if (data) {
+        setSettings(data.value);
+      } else {
+        // Si aucune donnée n'existe, on crée les paramètres par défaut
         const { error: upsertError } = await supabase
           .from('settings')
           .upsert({
@@ -83,11 +90,6 @@ const HeroForm: React.FC = () => {
 
         if (upsertError) throw upsertError;
         setSettings(defaultSettings);
-      } else if (data) {
-        setSettings({
-          ...defaultSettings,
-          ...data.value
-        });
       }
     } catch (err) {
       console.error('Erreur lors du chargement des paramètres:', err);
@@ -110,6 +112,7 @@ const HeroForm: React.FC = () => {
         });
 
       if (error) throw error;
+      
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
@@ -132,28 +135,22 @@ const HeroForm: React.FC = () => {
     try {
       const path = `hero/${type}_${Date.now()}_${file.name}`;
       const url = await uploadMedia(file, path);
-      
-      if (!url) {
-        throw new Error('URL de l\'image non reçue');
-      }
+
+      const newSettings = {
+        ...settings,
+        [type === 'main' ? 'main_image' : 'poster_image']: url
+      };
 
       const { error } = await supabase
         .from('settings')
         .upsert({
           key: 'hero_settings',
-          value: {
-            ...settings,
-            [type === 'main' ? 'main_image' : 'poster_image']: url
-          }
+          value: newSettings
         });
 
       if (error) throw error;
 
-      setSettings(prev => ({
-        ...prev,
-        [type === 'main' ? 'main_image' : 'poster_image']: url
-      }));
-
+      setSettings(newSettings);
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {

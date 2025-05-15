@@ -40,8 +40,7 @@ const Information: React.FC = () => {
   const tabs = [
     { id: 'infos', label: 'Infos Pratiques', icon: Info },
     { id: 'eco', label: 'Éco-responsable', icon: Leaf },
-    { id: 'scene', label: 'Scène à Vélos', icon: Bike },
-    { id: 'partners', label: 'Partenaires', icon: Users }
+    { id: 'scene', label: 'Scène à Vélos', icon: Bike }
   ];
 
   const essentialInfo = [
@@ -134,7 +133,7 @@ const Information: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto space-y-16">
           {activeTab === 'infos' && (
             <div className="space-y-12">
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -298,8 +297,16 @@ const Information: React.FC = () => {
             </div>
           )}
 
-          {activeTab === 'partners' && !loading && partners.length > 0 && (
-            <div className="bg-[#f6d9a0] rounded-xl p-8">
+          {!loading && partners.length > 0 && (
+            <div className="pt-16 border-t border-[#ca5231]/10">
+              <div className="text-center mb-12">
+                <h3 className="text-2xl font-['Swiss 721 Black Extended BT'] text-[#ca5231] mb-4">
+                  NOS PARTENAIRES
+                </h3>
+                <p className="font-['Rainy Days'] text-lg text-[#ca5231]/80">
+                  Ils nous font confiance et nous soutiennent
+                </p>
+              </div>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
                 {partners.map((partner) => (
                   <a 
@@ -307,7 +314,7 @@ const Information: React.FC = () => {
                     href={partner.website_url || '#'} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="bg-white/50 rounded-lg p-4 flex items-center justify-center h-32 transform hover:scale-105 transition-all duration-300 group"
+                    className="bg-[#f6d9a0] rounded-lg p-4 flex items-center justify-center h-32 transform hover:scale-105 transition-all duration-300 group"
                   >
                     <img 
                       src={partner.logo_url} 

@@ -19,10 +19,16 @@ const PosterForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string>(defaultSettings.image_url);
 
   useEffect(() => {
     loadSettings();
   }, []);
+
+  useEffect(() => {
+    // Mettre à jour la prévisualisation quand l'URL change
+    setPreview(settings.image_url);
+  }, [settings.image_url]);
 
   const loadSettings = async () => {
     try {
@@ -35,6 +41,7 @@ const PosterForm: React.FC = () => {
       if (error) throw error;
 
       if (!data) {
+        // Si aucune donnée n'existe, créer avec les paramètres par défaut
         const { error: upsertError } = await supabase
           .from('settings')
           .upsert({
@@ -45,11 +52,21 @@ const PosterForm: React.FC = () => {
         if (upsertError) throw upsertError;
         setSettings(defaultSettings);
       } else {
-        setSettings(data.value);
+        // Fusionner avec les paramètres par défaut pour s'assurer que toutes les propriétés existent
+        setSettings({ ...defaultSettings, ...data.value });
       }
     } catch (err) {
       console.error('Erreur lors du chargement des paramètres:', err);
       setError('Erreur lors du chargement des paramètres');
+    }
+  };
+
+  const validateImageUrl = async (url: string): Promise<boolean> => {
+    try {
+      const response = await fetch(url, { method: 'HEAD' });
+      return response.ok && response.headers.get('content-type')?.startsWith('image/');
+    } catch {
+      return false;
     }
   };
 
@@ -60,6 +77,12 @@ const PosterForm: React.FC = () => {
     setSuccess(false);
 
     try {
+      // Valider l'URL de l'image
+      const isValidImage = await validateImageUrl(settings.image_url);
+      if (!isValidImage) {
+        throw new Error("L'URL fournie n'est pas une image valide");
+      }
+
       const { error } = await supabase
         .from('settings')
         .upsert({
@@ -68,14 +91,20 @@ const PosterForm: React.FC = () => {
         });
 
       if (error) throw error;
+
       setSuccess(true);
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error('Erreur lors de l\'enregistrement:', err);
-      setError('Erreur lors de l\'enregistrement des paramètres');
+      setError(err instanceof Error ? err.message : 'Erreur lors de l\'enregistrement des paramètres');
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleImageUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const newUrl = e.target.value;
+    setSettings({ ...settings, image_url: newUrl });
   };
 
   return (
@@ -101,16 +130,18 @@ const PosterForm: React.FC = () => {
             <input
               type="url"
               value={settings.image_url}
-              onChange={(e) => setSettings({ ...settings, image_url: e.target.value })}
+              onChange={handleImageUrlChange}
               className="w-full px-4 py-2 border border-yellow-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500"
               placeholder="https://..."
+              required
             />
-            {settings.image_url && (
+            {preview && (
               <div className="relative aspect-[3/4] max-w-md mx-auto">
                 <img
-                  src={settings.image_url}
+                  src={preview}
                   alt="Aperçu de l'affiche"
                   className="w-full h-full object-cover rounded-lg shadow-lg"
+                  onError={() => setPreview(defaultSettings.image_url)}
                 />
               </div>
             )}
@@ -127,6 +158,7 @@ const PosterForm: React.FC = () => {
             onChange={(e) => setSettings({ ...settings, alt_text: e.target.value })}
             className="w-full px-4 py-2 border border-yellow-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500"
             placeholder="Description de l'affiche"
+            required
           />
         </div>
 

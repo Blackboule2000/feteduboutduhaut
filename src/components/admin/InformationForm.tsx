@@ -106,23 +106,21 @@ const InformationForm: React.FC = () => {
         .from('settings')
         .select('value')
         .eq('key', 'information_settings')
-        .limit(1);
+        .single();
 
-      if (error) throw error;
-
-      // If we have data, use it, otherwise use default settings
-      if (data && data.length > 0) {
-        setSettings(data[0].value);
-      } else {
-        // If no settings exist, create them with default values
-        const { error: insertError } = await supabase
+      if (error) {
+        // If no data exists, create it with default settings
+        const { error: upsertError } = await supabase
           .from('settings')
-          .insert({
+          .upsert({
             key: 'information_settings',
             value: defaultSettings
           });
 
-        if (insertError) throw insertError;
+        if (upsertError) throw upsertError;
+        setSettings(defaultSettings);
+      } else if (data) {
+        setSettings(data.value);
       }
     } catch (err) {
       console.error('Erreur lors du chargement des paramètres:', err);

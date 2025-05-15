@@ -71,20 +71,16 @@ const CustomizationForm: React.FC = () => {
         .single();
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          // Record not found, create it with default settings
-          const { error: upsertError } = await supabase
-            .from('settings')
-            .upsert({
-              key: 'customization_settings',
-              value: defaultSettings
-            });
+        // If no data exists, create it with default settings
+        const { error: upsertError } = await supabase
+          .from('settings')
+          .upsert({
+            key: 'customization_settings',
+            value: defaultSettings
+          });
 
-          if (upsertError) throw upsertError;
-          setSettings(defaultSettings);
-        } else {
-          throw error;
-        }
+        if (upsertError) throw upsertError;
+        setSettings(defaultSettings);
       } else if (data) {
         setSettings(data.value);
       }

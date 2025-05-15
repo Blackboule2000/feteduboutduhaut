@@ -74,21 +74,17 @@ const HeroForm: React.FC = () => {
         .single();
 
       if (error) {
-        if (error.code === 'PGRST116') {
-          // Si les paramètres n'existent pas, on les crée avec les valeurs par défaut
-          const { error: insertError } = await supabase
-            .from('settings')
-            .insert({
-              key: 'hero_settings',
-              value: defaultSettings
-            });
+        // If no data exists, create it with default settings
+        const { error: upsertError } = await supabase
+          .from('settings')
+          .upsert({
+            key: 'hero_settings',
+            value: defaultSettings
+          });
 
-          if (insertError) throw insertError;
-          setSettings(defaultSettings);
-        } else {
-          throw error;
-        }
-      } else if (data?.value) {
+        if (upsertError) throw upsertError;
+        setSettings(defaultSettings);
+      } else if (data) {
         setSettings({
           ...defaultSettings,
           ...data.value

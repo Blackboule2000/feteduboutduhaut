@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Music, Bike, Star } from 'lucide-react';
+import { Music, Bike, Star, Clock } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface Program {
@@ -107,10 +107,15 @@ const Schedule: React.FC = () => {
     );
   };
 
-  const ConcertCard = ({ concert, isMain = false, isMotolo = false }: { concert: Program, isMain?: boolean, isMotolo?: boolean }) => (
+  const ConcertCard = ({ concert, isMain = false, isMotolo = false, isAfterParty = false }: { 
+    concert: Program, 
+    isMain?: boolean, 
+    isMotolo?: boolean,
+    isAfterParty?: boolean 
+  }) => (
     <div className={`relative group ${isMotolo ? 'transform hover:scale-103' : isMain ? 'transform hover:scale-102' : 'transform hover:scale-101'}`}>
       <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
-      <div className={`concert-card bg-[#f6d9a0] rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative h-full ${isMotolo ? 'p-2' : ''}`}>
+      <div className={`concert-card bg-[#f6d9a0] rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative h-full ${isMotolo || isAfterParty ? 'p-2' : ''}`}>
         <div className="absolute inset-0 border-[12px] border-[#ca5231]/20 rounded-xl pointer-events-none"></div>
         <div className="absolute inset-[12px] border-[3px] border-[#ca5231]/30 rounded-lg pointer-events-none"></div>
         
@@ -119,8 +124,8 @@ const Schedule: React.FC = () => {
         <div className="absolute bottom-0 left-0 w-16 h-16 border-b-8 border-l-8 border-[#ca5231]/40 rounded-bl-xl"></div>
         <div className="absolute bottom-0 right-0 w-16 h-16 border-b-8 border-r-8 border-[#ca5231]/40 rounded-br-xl"></div>
 
-        <div className={`relative p-8 flex flex-col h-full ${isMotolo ? 'md:flex-row md:gap-8' : ''}`}>
-          <div className={`flex flex-col ${isMotolo ? 'md:w-1/2' : 'w-full'}`}>
+        <div className={`relative p-8 flex flex-col h-full ${isMotolo || isAfterParty ? 'md:flex-row md:gap-8' : ''}`}>
+          <div className={`flex flex-col ${isMotolo || isAfterParty ? 'md:w-1/2' : 'w-full'}`}>
             <div className="flex justify-between items-start mb-6">
               <div className="text-[#ca5231] text-2xl font-['Railroad Gothic'] bg-[#ca5231]/10 px-4 py-2 rounded-full">
                 {concert.time}
@@ -139,7 +144,7 @@ const Schedule: React.FC = () => {
               </div>
             </div>
 
-            {concert.image_url && !isMotolo && (
+            {concert.image_url && !isMotolo && !isAfterParty && (
               <div className="relative aspect-video mb-6 overflow-hidden rounded-xl shadow-xl">
                 <div className="absolute inset-0 bg-[#ca5231]/10"></div>
                 <img 
@@ -150,11 +155,11 @@ const Schedule: React.FC = () => {
               </div>
             )}
 
-            <h3 className={`font-['Swiss 721 Black Extended BT'] ${isMotolo ? 'text-5xl' : isMain ? 'text-4xl' : 'text-3xl'} text-[#ca5231] mb-4 text-center`}>
+            <h3 className={`font-['Swiss 721 Black Extended BT'] ${isMotolo || isAfterParty ? 'text-5xl' : isMain ? 'text-4xl' : 'text-3xl'} text-[#ca5231] mb-4 text-center`}>
               {concert.title}
             </h3>
 
-            <p className={`font-['Rainy Days'] text-[#ca5231]/80 mb-6 ${isMotolo ? 'text-2xl' : 'text-xl'} ${isMotolo ? 'text-left' : 'text-center'} flex-grow`}>
+            <p className={`font-['Rainy Days'] text-[#ca5231]/80 mb-6 ${isMotolo || isAfterParty ? 'text-2xl' : 'text-xl'} ${isMotolo || isAfterParty ? 'text-left' : 'text-center'} flex-grow`}>
               {concert.description}
             </p>
 
@@ -163,7 +168,7 @@ const Schedule: React.FC = () => {
             </div>
           </div>
 
-          {isMotolo && concert.image_url && (
+          {(isMotolo || isAfterParty) && concert.image_url && (
             <div className="md:w-1/2 mt-6 md:mt-0">
               <div className="relative aspect-video overflow-hidden rounded-xl shadow-xl mb-6">
                 <div className="absolute inset-0 bg-[#ca5231]/10"></div>
@@ -177,7 +182,7 @@ const Schedule: React.FC = () => {
             </div>
           )}
 
-          {!isMotolo && (
+          {!isMotolo && !isAfterParty && (
             <div className="mt-4">
               <VideoPlayer url={concert.video_url} />
             </div>
@@ -239,16 +244,17 @@ const Schedule: React.FC = () => {
 
         {/* After party */}
         {afterParty && (
-          <div className="max-w-3xl mx-auto">
+          <div className="max-w-[1200px] mx-auto">
             <div className="text-center mb-8">
-              <h3 className="font-['Swiss 721 Black Extended BT'] text-3xl text-[#f6d9a0] mb-2">
-                AFTER PARTY
-              </h3>
-              <p className="text-xl text-[#f6d9a0]/90 font-['Rainy Days']">
+              <div className="inline-block bg-[#f6d9a0] px-6 py-2 rounded-full mb-4">
+                <Clock className="inline-block mr-2 text-[#ca5231]" size={24} />
+                <span className="font-['Railroad Gothic'] text-2xl text-[#ca5231]">AFTER PARTY</span>
+              </div>
+              <p className="text-2xl text-[#f6d9a0]/90 font-['Rainy Days']">
                 Pour continuer la fête jusqu'au bout de la nuit
               </p>
             </div>
-            <ConcertCard concert={afterParty} />
+            <ConcertCard concert={afterParty} isAfterParty={true} />
           </div>
         )}
         

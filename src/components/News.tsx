@@ -74,6 +74,15 @@ const News: React.FC = () => {
     );
   }
 
+  const handleNewsClick = (news: NewsItem, e: React.MouseEvent) => {
+    e.stopPropagation();
+    setSelectedNews(news);
+  };
+
+  const handleModalClose = () => {
+    setSelectedNews(null);
+  };
+
   return (
     <section id="actualités" className="py-20 relative overflow-hidden bg-[#f6d9a0]">
       <div className="absolute inset-0 bg-retro-pattern opacity-10"></div>
@@ -117,7 +126,7 @@ const News: React.FC = () => {
                     <div className="tape tape-left"></div>
                     <div className="tape tape-right"></div>
                     
-                    <div className="polaroid-image relative h-[70%] overflow-hidden mb-6 group">
+                    <div className="polaroid-image relative h-[70%] overflow-hidden mb-6 group cursor-pointer" onClick={(e) => handleNewsClick(news, e)}>
                       <img
                         src={news.image_url}
                         alt={news.title}
@@ -128,7 +137,7 @@ const News: React.FC = () => {
                       />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                         <button
-                          onClick={() => setSelectedNews(news)}
+                          onClick={(e) => handleNewsClick(news, e)}
                           className="bg-[#ca5231] text-white px-6 py-3 rounded-full transform -translate-y-4 group-hover:translate-y-0 transition-all duration-300 font-['Railroad Gothic'] text-lg hover:bg-[#ca5231]/80"
                         >
                           En savoir plus
@@ -190,18 +199,24 @@ const News: React.FC = () => {
 
       {/* Modal */}
       {selectedNews && (
-        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
+        <div 
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+          onClick={handleModalClose}
+        >
+          <div 
+            className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+            onClick={(e) => e.stopPropagation()}
+          >
             <div className="flex justify-between items-center absolute top-4 right-4 left-4 z-10">
               <button
-                onClick={() => setSelectedNews(null)}
+                onClick={handleModalClose}
                 className="flex items-center text-white hover:text-gray-200 transition-colors"
               >
                 <ArrowLeft className="w-6 h-6 mr-2" />
                 <span className="font-['Railroad Gothic']">Retour</span>
               </button>
               <button
-                onClick={() => setSelectedNews(null)}
+                onClick={handleModalClose}
                 className="text-white hover:text-gray-200"
               >
                 <X className="w-6 h-6" />

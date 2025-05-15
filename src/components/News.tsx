@@ -117,7 +117,7 @@ const News: React.FC = () => {
             ))}
           </div>
 
-          <div className="relative h-[700px] overflow-hidden">
+          <div className="relative h-[700px] overflow-visible">
             {newsData.map((news, index) => {
               const tapeRotation = Math.random() * 6 - 3;
               const isExpanded = expandedId === news.id;
@@ -138,7 +138,7 @@ const News: React.FC = () => {
                   } as React.CSSProperties}
                 >
                   <div 
-                    className={`polaroid-card h-full transform hover:rotate-1 transition-all duration-500 bg-[#f6d9a0] cursor-pointer ${
+                    className={`polaroid-card transform hover:rotate-1 transition-all duration-500 bg-[#f6d9a0] cursor-pointer ${
                       isExpanded ? 'scale-105' : ''
                     }`}
                   >
@@ -146,7 +146,7 @@ const News: React.FC = () => {
                     <div className="tape tape-left"></div>
                     <div className="tape tape-right"></div>
                     
-                    <div className={`polaroid-image relative ${isExpanded ? 'h-[40%]' : 'h-[70%]'} overflow-hidden mb-6 transition-all duration-500`}>
+                    <div className={`polaroid-image relative ${isExpanded ? 'h-[40%]' : 'h-[60%]'} overflow-hidden mb-6 transition-all duration-500`}>
                       <img
                         src={news.image_url}
                         alt={news.title}
@@ -156,7 +156,7 @@ const News: React.FC = () => {
                         }}
                       />
                     </div>
-                    <div className="text-center px-8">
+                    <div className="text-center px-8 pb-8">
                       <div className="polaroid-date mb-4 font-['Railroad Gothic'] text-xl">
                         {new Date(news.date).toLocaleDateString('fr-FR', {
                           day: 'numeric',
@@ -168,7 +168,7 @@ const News: React.FC = () => {
                         {news.title}
                       </h3>
                       <div className={`relative overflow-hidden transition-all duration-500 ${
-                        isExpanded ? 'max-h-[500px]' : 'max-h-[100px]'
+                        isExpanded ? 'max-h-[300px]' : 'max-h-[80px]'
                       }`}>
                         <p className="text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed">
                           {news.description}
@@ -182,15 +182,15 @@ const News: React.FC = () => {
                           e.stopPropagation();
                           toggleExpand(news.id);
                         }}
-                        className="mt-6 inline-flex items-center px-8 py-3 bg-[#ca5231] text-white rounded-full hover:bg-[#ca5231]/80 transition-all duration-300 transform hover:scale-105 text-xl font-['Railroad Gothic'] shadow-lg"
+                        className="mt-4 inline-flex items-center px-6 py-2 bg-[#ca5231] text-white rounded-full hover:bg-[#ca5231]/80 transition-all duration-300 transform hover:scale-105 text-lg font-['Railroad Gothic'] shadow-lg"
                       >
                         {isExpanded ? (
                           <>
-                            Voir moins <ChevronUp className="ml-2 w-6 h-6" />
+                            Voir moins <ChevronUp className="ml-2 w-5 h-5" />
                           </>
                         ) : (
                           <>
-                            Lire la suite <ChevronDown className="ml-2 w-6 h-6" />
+                            Lire la suite <ChevronDown className="ml-2 w-5 h-5" />
                           </>
                         )}
                       </button>

@@ -20,6 +20,23 @@ const News: React.FC = () => {
     loadNews();
   }, []);
 
+  useEffect(() => {
+    const timer = setInterval(nextSlide, 8000);
+    return () => clearInterval(timer);
+  }, [newsData.length]);
+
+  // Move the Escape key handler outside of the conditional rendering
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleModalClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, []);
+
   const loadNews = async () => {
     try {
       const { data } = await supabase
@@ -49,10 +66,13 @@ const News: React.FC = () => {
     );
   };
 
-  useEffect(() => {
-    const timer = setInterval(nextSlide, 8000);
-    return () => clearInterval(timer);
-  }, [newsData.length]);
+  const handleNewsClick = (news: NewsItem) => {
+    setSelectedNews(news);
+  };
+
+  const handleModalClose = () => {
+    setSelectedNews(null);
+  };
 
   if (loading) {
     return (
@@ -73,26 +93,6 @@ const News: React.FC = () => {
       </section>
     );
   }
-
-  const handleNewsClick = (news: NewsItem) => {
-    setSelectedNews(news);
-  };
-
-  const handleModalClose = () => {
-    setSelectedNews(null);
-  };
-
-  // Gestionnaire pour la touche Escape
-  useEffect(() => {
-    const handleEscape = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') {
-        handleModalClose();
-      }
-    };
-
-    window.addEventListener('keydown', handleEscape);
-    return () => window.removeEventListener('keydown', handleEscape);
-  }, []);
 
   return (
     <section id="actualités" className="py-20 relative overflow-hidden bg-[#f6d9a0]">

@@ -58,17 +58,17 @@ const Schedule: React.FC = () => {
     }
   };
 
+  // Séparation des concerts par catégorie
   const mainConcerts = program.filter(concert => 
     concert.title === "MOTOLO" || concert.title === "ARBAS"
-  ).sort((a, b) => {
-    return a.title === "MOTOLO" ? -1 : 1;
-  });
+  ).sort((a, b) => a.title === "MOTOLO" ? -1 : 1);
   
   const otherConcerts = program.filter(concert => 
     concert.title !== "MOTOLO" && 
     concert.title !== "ARBAS" && 
     concert.title !== "Anna Rudy & Paul Lazarus"
   );
+  
   const afterParty = program.find(concert => concert.title === "Anna Rudy & Paul Lazarus");
 
   const AudioPlayer = ({ url }: { url: string | null }) => {
@@ -95,7 +95,7 @@ const Schedule: React.FC = () => {
     if (!url) return null;
     
     return (
-      <div className="mt-4 aspect-video rounded-lg overflow-hidden">
+      <div className="mt-4 aspect-video rounded-lg overflow-hidden shadow-lg">
         <iframe
           width="100%"
           height="100%"
@@ -111,9 +111,9 @@ const Schedule: React.FC = () => {
   };
 
   const ConcertCard = ({ concert, isMain = false }: { concert: Program, isMain?: boolean }) => (
-    <div className={`relative group ${isMain ? 'transform hover:scale-105' : 'transform hover:scale-102'}`}>
+    <div className={`relative group ${isMain ? 'transform hover:scale-102' : 'transform hover:scale-101'}`}>
       <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
-      <div className="concert-card bg-[#f6d9a0] rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative">
+      <div className="concert-card bg-[#f6d9a0] rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative h-full">
         <div className="absolute inset-0 border-[12px] border-[#ca5231]/20 rounded-xl pointer-events-none"></div>
         <div className="absolute inset-[12px] border-[3px] border-[#ca5231]/30 rounded-lg pointer-events-none"></div>
         
@@ -122,7 +122,7 @@ const Schedule: React.FC = () => {
         <div className="absolute bottom-0 left-0 w-16 h-16 border-b-8 border-l-8 border-[#ca5231]/40 rounded-bl-xl"></div>
         <div className="absolute bottom-0 right-0 w-16 h-16 border-b-8 border-r-8 border-[#ca5231]/40 rounded-br-xl"></div>
 
-        <div className="relative p-8">
+        <div className="relative p-8 flex flex-col h-full">
           <div className="flex justify-between items-start mb-6">
             <div className="text-[#ca5231] text-2xl font-['Railroad Gothic'] bg-[#ca5231]/10 px-4 py-2 rounded-full">
               {concert.time}
@@ -156,12 +156,14 @@ const Schedule: React.FC = () => {
             {concert.title}
           </h3>
 
-          <p className="font-['Rainy Days'] text-[#ca5231]/80 mb-6 text-xl text-center">
+          <p className="font-['Rainy Days'] text-[#ca5231]/80 mb-6 text-xl text-center flex-grow">
             {concert.description}
           </p>
 
-          <AudioPlayer url={concert.audio_url || null} />
-          <VideoPlayer url={concert.video_url} />
+          <div className="mt-auto">
+            <AudioPlayer url={concert.audio_url || null} />
+            <VideoPlayer url={concert.video_url} />
+          </div>
         </div>
       </div>
     </div>
@@ -186,14 +188,18 @@ const Schedule: React.FC = () => {
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="vintage-button inline-block mb-4">
             <Music className="inline-block mr-2" size={18} />
-            <span className="font-['Railroad Gothic']">CONCERT</span>
+            <span className="font-['Railroad Gothic']">CONCERTS</span>
           </div>
           <h2 className="font-['Swiss 721 Black Extended BT'] text-4xl md:text-5xl mb-4 font-bold text-[#f6d9a0] drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
             PROGRAMMATION
           </h2>
+          <p className="text-xl text-[#f6d9a0]/90 font-['Rainy Days']">
+            Une soirée exceptionnelle avec des artistes talentueux
+          </p>
         </div>
 
-        <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 mb-24">
+        {/* Têtes d'affiche */}
+        <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 mb-16">
           {mainConcerts.map((concert) => (
             <div key={concert.id} className="flex-1 min-w-0 max-w-[600px]">
               <ConcertCard concert={concert} isMain={true} />
@@ -201,18 +207,29 @@ const Schedule: React.FC = () => {
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
+        {/* Autres concerts */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {otherConcerts.map((concert) => (
             <ConcertCard key={concert.id} concert={concert} />
           ))}
         </div>
 
+        {/* After party */}
         {afterParty && (
-          <div className="max-w-3xl mx-auto mb-24">
+          <div className="max-w-3xl mx-auto">
+            <div className="text-center mb-8">
+              <h3 className="font-['Swiss 721 Black Extended BT'] text-3xl text-[#f6d9a0] mb-2">
+                AFTER PARTY
+              </h3>
+              <p className="text-xl text-[#f6d9a0]/90 font-['Rainy Days']">
+                Pour continuer la fête jusqu'au bout de la nuit
+              </p>
+            </div>
             <ConcertCard concert={afterParty} />
           </div>
         )}
         
+        {/* Programme horaire */}
         <div className="mt-16 bg-[#f6d9a0]/90 backdrop-blur-sm rounded-xl p-8 text-center max-w-3xl mx-auto transform hover:rotate-1 transition-transform duration-300">
           <h3 className="font-['Swiss 721 Black Extended BT'] text-3xl mb-8 text-[#ca5231]">HORAIRES DES CONCERTS</h3>
           <div className="space-y-4">

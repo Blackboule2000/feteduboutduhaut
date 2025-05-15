@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, ArrowLeft } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface NewsItem {
@@ -192,12 +192,21 @@ const News: React.FC = () => {
       {selectedNews && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative">
-            <button
-              onClick={() => setSelectedNews(null)}
-              className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 z-10"
-            >
-              <X className="w-6 h-6" />
-            </button>
+            <div className="flex justify-between items-center absolute top-4 right-4 left-4 z-10">
+              <button
+                onClick={() => setSelectedNews(null)}
+                className="flex items-center text-white hover:text-gray-200 transition-colors"
+              >
+                <ArrowLeft className="w-6 h-6 mr-2" />
+                <span className="font-['Railroad Gothic']">Retour</span>
+              </button>
+              <button
+                onClick={() => setSelectedNews(null)}
+                className="text-white hover:text-gray-200"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
             
             <div className="aspect-video w-full">
               <img

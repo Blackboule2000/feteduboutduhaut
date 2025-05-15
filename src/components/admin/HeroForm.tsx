@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
 import { Save, Upload } from 'lucide-react';
-import { uploadMedia } from '../../lib/media';
 
 interface HeroSettings {
   title: string;
@@ -13,17 +12,10 @@ interface HeroSettings {
   social_links: {
     facebook: string;
     instagram: string;
-    twitter: string;
-  };
-  cta_button: {
-    text: string;
-    url: string;
-    enabled: boolean;
   };
   countdown: {
     enabled: boolean;
     target_date: string;
-    background_color: string;
   };
 }
 
@@ -36,18 +28,11 @@ const defaultSettings: HeroSettings = {
   background_color: '#f6d9a0',
   social_links: {
     facebook: 'https://www.facebook.com/AssociationDuBoutDuHaut',
-    instagram: 'https://www.instagram.com/association_du_bout_du_haut',
-    twitter: ''
-  },
-  cta_button: {
-    text: 'Réserver maintenant',
-    url: '#contact',
-    enabled: false
+    instagram: 'https://www.instagram.com/association_du_bout_du_haut'
   },
   countdown: {
     enabled: true,
-    target_date: '2025-07-26T11:00:00',
-    background_color: '#f6d9a0'
+    target_date: '2025-07-26T11:00:00'
   }
 };
 
@@ -56,7 +41,7 @@ const HeroForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [uploadLoading, setUploadLoading] = useState({
+  const [uploadStatus, setUploadStatus] = useState({
     main: false,
     poster: false
   });
@@ -74,13 +59,6 @@ const HeroForm: React.FC = () => {
         .maybeSingle();
 
       if (error) {
-        throw error;
-      }
-
-      if (data) {
-        setSettings(data.value);
-      } else {
-        // Si aucune donnée n'existe, on crée les paramètres par défaut
         const { error: upsertError } = await supabase
           .from('settings')
           .upsert({
@@ -90,6 +68,8 @@ const HeroForm: React.FC = () => {
 
         if (upsertError) throw upsertError;
         setSettings(defaultSettings);
+      } else if (data) {
+        setSettings(data.value);
       }
     } catch (err) {
       console.error('Erreur lors du chargement des paramètres:', err);
@@ -124,17 +104,23 @@ const HeroForm: React.FC = () => {
   };
 
   const handleImageUpload = async (file: File | null, type: 'main' | 'poster') => {
-    if (!file) {
-      setError('Aucun fichier sélectionné');
-      return;
-    }
+    if (!file) return;
 
     setError(null);
-    setUploadLoading(prev => ({ ...prev, [type]: true }));
+    setUploadStatus(prev => ({ ...prev, [type]: true }));
 
     try {
       const path = `hero/${type}_${Date.now()}_${file.name}`;
-      const url = await uploadMedia(file, path);
+      const url = await supabase.storage
+        .from('media')
+        .upload(path, file, {
+          cacheControl: '3600',
+          upsert: true
+        })
+        .then(({ data, error }) => {
+          if (error) throw error;
+          return supabase.storage.from('media').getPublicUrl(data.path).data.publicUrl;
+        });
 
       const newSettings = {
         ...settings,
@@ -155,14 +141,14 @@ const HeroForm: React.FC = () => {
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error('Erreur lors de l\'upload:', err);
-      setError(err instanceof Error ? err.message : 'Erreur lors du téléchargement du fichier');
+      setError('Erreur lors du téléchargement de l\'image');
     } finally {
-      setUploadLoading(prev => ({ ...prev, [type]: false }));
+      setUploadStatus(prev => ({ ...prev, [type]: false }));
     }
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
+    <form onSubmit={handleSubmit} className="space-y-8">
       {error && (
         <div className="bg-red-50 text-red-700 p-4 rounded-md">
           {error}
@@ -223,7 +209,11 @@ const HeroForm: React.FC = () => {
             className="w-full h-10"
           />
         </div>
+      </div>
 
+      <div className="space-y-6">
+        <h3 className="text-lg font-medium text-yellow-900">Images</h3>
+        
         <div>
           <label className="block text-sm font-medium text-yellow-700 mb-2">
             Image principale
@@ -247,14 +237,11 @@ const HeroForm: React.FC = () => {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  handleImageUpload(file, 'main');
-                }}
+                onChange={(e) => handleImageUpload(e.target.files?.[0], 'main')}
                 className="flex-1"
-                disabled={uploadLoading.main}
+                disabled={uploadStatus.main}
               />
-              {uploadLoading.main ? (
+              {uploadStatus.main ? (
                 <div className="animate-spin h-5 w-5 text-yellow-600">⌛</div>
               ) : (
                 <Upload className="h-5 w-5 text-yellow-600" />
@@ -286,14 +273,11 @@ const HeroForm: React.FC = () => {
               <input
                 type="file"
                 accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  handleImageUpload(file, 'poster');
-                }}
+                onChange={(e) => handleImageUpload(e.target.files?.[0], 'poster')}
                 className="flex-1"
-                disabled={uploadLoading.poster}
+                disabled={uploadStatus.poster}
               />
-              {uploadLoading.poster ? (
+              {uploadStatus.poster ? (
                 <div className="animate-spin h-5 w-5 text-yellow-600">⌛</div>
               ) : (
                 <Upload className="h-5 w-5 text-yellow-600" />
@@ -307,7 +291,7 @@ const HeroForm: React.FC = () => {
         <h3 className="text-lg font-medium text-yellow-900">Réseaux sociaux</h3>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label className="block text-sm font-medium text-yellow-700 mb-1">
+            <label className="block text-sm font-medium text-yellow-700 mb-2">
               Facebook
             </label>
             <input
@@ -325,7 +309,7 @@ const HeroForm: React.FC = () => {
             />
           </div>
           <div>
-            <label className="block text-sm font-medium text-yellow-700 mb-1">
+            <label className="block text-sm font-medium text-yellow-700 mb-2">
               Instagram
             </label>
             <input
@@ -342,67 +326,6 @@ const HeroForm: React.FC = () => {
               placeholder="https://instagram.com/..."
             />
           </div>
-        </div>
-      </div>
-
-      <div className="space-y-6">
-        <h3 className="text-lg font-medium text-yellow-900">Bouton d'action</h3>
-        <div className="space-y-4">
-          <div className="flex items-center">
-            <input
-              type="checkbox"
-              checked={settings.cta_button.enabled}
-              onChange={(e) => setSettings({
-                ...settings,
-                cta_button: { 
-                  ...settings.cta_button,
-                  enabled: e.target.checked 
-                }
-              })}
-              className="h-4 w-4 text-yellow-600 focus:ring-yellow-500 border-yellow-300 rounded"
-            />
-            <label className="ml-2 block text-sm text-yellow-700">
-              Afficher le bouton d'action
-            </label>
-          </div>
-          {settings.cta_button.enabled && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-yellow-700 mb-1">
-                  Texte du bouton
-                </label>
-                <input
-                  type="text"
-                  value={settings.cta_button.text}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    cta_button: { 
-                      ...settings.cta_button,
-                      text: e.target.value 
-                    }
-                  })}
-                  className="w-full px-4 py-2 border border-yellow-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-yellow-700 mb-1">
-                  URL du bouton
-                </label>
-                <input
-                  type="text"
-                  value={settings.cta_button.url}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    cta_button: { 
-                      ...settings.cta_button,
-                      url: e.target.value 
-                    }
-                  })}
-                  className="w-full px-4 py-2 border border-yellow-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500"
-                />
-              </div>
-            </div>
-          )}
         </div>
       </div>
 
@@ -427,41 +350,22 @@ const HeroForm: React.FC = () => {
             </label>
           </div>
           {settings.countdown.enabled && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-yellow-700 mb-1">
-                  Date et heure cible
-                </label>
-                <input
-                  type="datetime-local"
-                  value={settings.countdown.target_date}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    countdown: { 
-                      ...settings.countdown,
-                      target_date: e.target.value 
-                    }
-                  })}
-                  className="w-full px-4 py-2 border border-yellow-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-yellow-700 mb-1">
-                  Couleur de fond
-                </label>
-                <input
-                  type="color"
-                  value={settings.countdown.background_color}
-                  onChange={(e) => setSettings({
-                    ...settings,
-                    countdown: { 
-                      ...settings.countdown,
-                      background_color: e.target.value 
-                    }
-                  })}
-                  className="w-full h-10"
-                />
-              </div>
+            <div>
+              <label className="block text-sm font-medium text-yellow-700 mb-2">
+                Date et heure cible
+              </label>
+              <input
+                type="datetime-local"
+                value={settings.countdown.target_date}
+                onChange={(e) => setSettings({
+                  ...settings,
+                  countdown: { 
+                    ...settings.countdown,
+                    target_date: e.target.value 
+                  }
+                })}
+                className="w-full px-4 py-2 border border-yellow-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500"
+              />
             </div>
           )}
         </div>

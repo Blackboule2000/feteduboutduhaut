@@ -56,6 +56,10 @@ const HeroForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [uploadLoading, setUploadLoading] = useState<{ main: boolean; poster: boolean }>({
+    main: false,
+    poster: false
+  });
 
   useEffect(() => {
     loadSettings();
@@ -95,17 +99,32 @@ const HeroForm: React.FC = () => {
     }
   };
 
-  const handleImageUpload = async (file: File, type: 'main' | 'poster') => {
+  const handleImageUpload = async (file: File | null, type: 'main' | 'poster') => {
+    if (!file) {
+      setError('Aucun fichier sélectionné');
+      return;
+    }
+
+    setError(null);
+    setUploadLoading(prev => ({ ...prev, [type]: true }));
+
     try {
       const path = `hero/${type}_${Date.now()}_${file.name}`;
       const url = await uploadMedia(file, path);
+      
+      if (!url) {
+        throw new Error('URL de l\'image non reçue');
+      }
+
       setSettings(prev => ({
         ...prev,
         [type === 'main' ? 'main_image' : 'poster_image']: url
       }));
     } catch (err) {
       console.error('Erreur lors de l\'upload:', err);
-      setError('Erreur lors de l\'upload de l\'image');
+      setError(err instanceof Error ? err.message : 'Erreur lors du téléchargement du fichier');
+    } finally {
+      setUploadLoading(prev => ({ ...prev, [type]: false }));
     }
   };
 
@@ -222,11 +241,16 @@ const HeroForm: React.FC = () => {
                 accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) handleImageUpload(file, 'main');
+                  handleImageUpload(file, 'main');
                 }}
                 className="flex-1"
+                disabled={uploadLoading.main}
               />
-              <Upload className="h-5 w-5 text-yellow-600" />
+              {uploadLoading.main ? (
+                <div className="animate-spin h-5 w-5 text-yellow-600">⌛</div>
+              ) : (
+                <Upload className="h-5 w-5 text-yellow-600" />
+              )}
             </div>
           </div>
         </div>
@@ -256,11 +280,16 @@ const HeroForm: React.FC = () => {
                 accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0];
-                  if (file) handleImageUpload(file, 'poster');
+                  handleImageUpload(file, 'poster');
                 }}
                 className="flex-1"
+                disabled={uploadLoading.poster}
               />
-              <Upload className="h-5 w-5 text-yellow-600" />
+              {uploadLoading.poster ? (
+                <div className="animate-spin h-5 w-5 text-yellow-600">⌛</div>
+              ) : (
+                <Upload className="h-5 w-5 text-yellow-600" />
+              )}
             </div>
           </div>
         </div>

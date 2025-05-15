@@ -8,8 +8,9 @@ export async function uploadMedia(file: File, path: string): Promise<string> {
     throw new Error('Seules les images sont autorisées');
   }
 
-  if (file.size > 5 * 1024 * 1024) {
-    throw new Error('La taille du fichier ne doit pas dépasser 5MB');
+  const maxSize = 5 * 1024 * 1024; // 5MB
+  if (file.size > maxSize) {
+    throw new Error(`La taille du fichier ne doit pas dépasser ${Math.round(maxSize / 1024 / 1024)}MB`);
   }
 
   const formData = new FormData();
@@ -29,8 +30,14 @@ export async function uploadMedia(file: File, path: string): Promise<string> {
     );
 
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.error || 'Erreur lors du téléchargement');
+      let errorMessage = 'Erreur lors du téléchargement';
+      try {
+        const errorData = await response.json();
+        errorMessage = errorData.error || errorMessage;
+      } catch {
+        // If we can't parse the error JSON, use the default message
+      }
+      throw new Error(errorMessage);
     }
 
     const data = await response.json();
@@ -42,6 +49,6 @@ export async function uploadMedia(file: File, path: string): Promise<string> {
     return data.url;
   } catch (error) {
     console.error('Erreur lors du téléchargement:', error);
-    throw new Error(error instanceof Error ? error.message : 'Erreur lors du téléchargement du fichier');
+    throw error instanceof Error ? error : new Error('Erreur lors du téléchargement du fichier');
   }
 }

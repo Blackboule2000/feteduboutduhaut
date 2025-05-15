@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Mail, Phone, Facebook, Instagram, Leaf, Recycle, Truck, Info, Calendar, Clock, MapPin, Tent, ArrowRight, Music, Beer, ShoppingBag, Users } from 'lucide-react';
+import { Mail, Phone, Facebook, Instagram, Leaf, Recycle, Truck, Info, Calendar, Clock, MapPin, Tent, ArrowRight, Music, Beer, ShoppingBag, Users, Bike } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface Partner {

@@ -93,10 +93,9 @@ const Header: React.FC = () => {
 
       if (error) {
         console.error('Erreur lors de la requête:', error);
-        return; // Keep using default settings
+        return;
       }
 
-      // If no data found, create default settings
       if (!data) {
         const { error: insertError } = await supabase
           .from('settings')
@@ -107,21 +106,19 @@ const Header: React.FC = () => {
 
         if (insertError) {
           console.error('Erreur lors de la création des paramètres par défaut:', insertError);
-          return; // Keep using default settings
+          return;
         }
       } else {
-        // Use fetched settings
         setSettings(data.value);
       }
     } catch (err) {
       console.error('Erreur lors du chargement des paramètres:', err);
-      // Keep using default settings on error
     }
   };
 
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
-    setIsOpen(false); // Close mobile menu if open
+    setIsOpen(false);
     
     if (href.startsWith('#')) {
       const targetElement = document.querySelector(href);
@@ -207,12 +204,12 @@ const Header: React.FC = () => {
                 <img 
                   src={settings.logo.image_url}
                   alt={settings.logo.alt_text}
-                  className="h-16 w-16 object-cover"
+                  className="h-12 md:h-16 w-12 md:w-16 object-contain"
                 />
                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
               <span 
-                className="font-['Swiss 721 Black Extended BT'] text-2xl uppercase tracking-wider font-bold"
+                className="hidden md:block font-['Swiss 721 Black Extended BT'] text-2xl uppercase tracking-wider font-bold"
                 style={{ color: settings.styles.text_color }}
               >
                 {settings.title.text}
@@ -220,7 +217,7 @@ const Header: React.FC = () => {
             </Link>
             
             {settings.decorative_elements.show_windmill && (
-              <div className="ml-8 relative">
+              <div className="ml-8 relative hidden md:block">
                 <img 
                   src={settings.decorative_elements.windmill_image_url}
                   alt="Éolienne" 

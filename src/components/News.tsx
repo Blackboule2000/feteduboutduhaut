@@ -15,6 +15,7 @@ const News: React.FC = () => {
   const [newsData, setNewsData] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const [isModalEntering, setIsModalEntering] = useState(false);
 
   useEffect(() => {
     loadNews();
@@ -28,7 +29,7 @@ const News: React.FC = () => {
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
-        setSelectedNews(null);
+        closeModal();
       }
     };
 
@@ -63,6 +64,20 @@ const News: React.FC = () => {
     setCurrentIndex((prevIndex) => 
       prevIndex === 0 ? newsData.length - 1 : prevIndex - 1
     );
+  };
+
+  const openModal = (news: NewsItem) => {
+    setSelectedNews(news);
+    setIsModalEntering(true);
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeModal = () => {
+    setIsModalEntering(false);
+    setTimeout(() => {
+      setSelectedNews(null);
+      document.body.style.overflow = '';
+    }, 300);
   };
 
   if (loading) {
@@ -113,15 +128,11 @@ const News: React.FC = () => {
                   key={news.id}
                   className={`absolute inset-0 transition-all duration-1000 transform ${
                     index === currentIndex 
-                      ? 'opacity-100 rotate-0 scale-100' 
+                      ? 'opacity-100 translate-x-0 scale-100' 
                       : index < currentIndex
-                      ? 'opacity-0 -rotate-12 scale-90'
-                      : 'opacity-0 rotate-12 scale-90'
+                      ? 'opacity-0 -translate-x-full scale-95'
+                      : 'opacity-0 translate-x-full scale-95'
                   }`}
-                  style={{
-                    '--rotation': `${Math.random() * 3 - 1.5}deg`,
-                    '--tape-rotation': `${tapeRotation}deg`
-                  } as React.CSSProperties}
                 >
                   <div className="polaroid-card h-full transform hover:rotate-1 transition-transform duration-500 bg-[#f6d9a0]">
                     <div className="tape tape-top"></div>
@@ -129,22 +140,23 @@ const News: React.FC = () => {
                     <div className="tape tape-right"></div>
                     
                     <div 
-                      className="polaroid-image relative h-[70%] overflow-hidden mb-6 group cursor-pointer"
-                      onClick={() => setSelectedNews(news)}
+                      className="polaroid-image relative h-[70%] overflow-hidden mb-6 cursor-pointer group"
+                      onClick={() => openModal(news)}
                     >
                       <img
                         src={news.image_url}
                         alt={news.title}
-                        className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
+                        className="w-full h-full object-cover transform transition-all duration-700 group-hover:scale-110"
                       />
-                      <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-                        <button
-                          className="bg-[#ca5231] text-white px-6 py-3 rounded-full transform -translate-y-4 group-hover:translate-y-0 transition-all duration-300 font-['Railroad Gothic'] text-lg hover:bg-[#ca5231]/80"
-                        >
-                          En savoir plus
-                        </button>
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-all duration-500">
+                        <div className="absolute bottom-0 left-0 right-0 p-6 transform translate-y-full group-hover:translate-y-0 transition-transform duration-500">
+                          <button className="bg-[#ca5231] text-white px-6 py-3 rounded-full font-['Railroad Gothic'] text-lg hover:bg-[#ca5231]/80 transition-colors">
+                            En savoir plus
+                          </button>
+                        </div>
                       </div>
                     </div>
+
                     <div className="text-center px-8">
                       <div className="polaroid-date mb-4 font-['Railroad Gothic'] text-xl">
                         {new Date(news.date).toLocaleDateString('fr-FR', {
@@ -156,10 +168,8 @@ const News: React.FC = () => {
                       <h3 className="text-3xl font-bold text-[#ca5231] mb-4 transform hover:translate-x-2 transition-transform font-['Swiss 721 Black Extended BT']">
                         {news.title}
                       </h3>
-                      <p className="text-xl text-[#ca5231]/80 transform hover:translate-y-[-2px] transition-transform font-['Rainy Days'] leading-relaxed">
-                        {news.description.length > 150 
-                          ? `${news.description.substring(0, 150)}...` 
-                          : news.description}
+                      <p className="text-xl text-[#ca5231]/80 line-clamp-3 font-['Rainy Days'] leading-relaxed">
+                        {news.description}
                       </p>
                     </div>
                   </div>
@@ -201,24 +211,32 @@ const News: React.FC = () => {
       {/* Modal */}
       {selectedNews && (
         <div 
-          className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-          onClick={() => setSelectedNews(null)}
+          className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${
+            isModalEntering 
+              ? 'opacity-100 backdrop-blur-sm' 
+              : 'opacity-0 backdrop-blur-none'
+          }`}
+          onClick={closeModal}
         >
           <div 
-            className="bg-white rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto relative"
+            className={`bg-white rounded-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto relative shadow-2xl transition-all duration-500 transform ${
+              isModalEntering 
+                ? 'translate-y-0 opacity-100' 
+                : 'translate-y-8 opacity-0'
+            }`}
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex justify-between items-center absolute top-4 right-4 left-4 z-10">
+            <div className="sticky top-0 z-10 flex justify-between items-center p-4 bg-gradient-to-b from-black/80 to-transparent">
               <button
-                onClick={() => setSelectedNews(null)}
-                className="flex items-center text-white hover:text-gray-200 transition-colors"
+                onClick={closeModal}
+                className="flex items-center text-white hover:text-yellow-200 transition-colors"
               >
                 <ArrowLeft className="w-6 h-6 mr-2" />
-                <span className="font-['Railroad Gothic']">Retour</span>
+                <span className="font-['Railroad Gothic']">Retour aux actualités</span>
               </button>
               <button
-                onClick={() => setSelectedNews(null)}
-                className="text-white hover:text-gray-200"
+                onClick={closeModal}
+                className="text-white hover:text-yellow-200 transition-colors"
               >
                 <X className="w-6 h-6" />
               </button>
@@ -233,7 +251,7 @@ const News: React.FC = () => {
             </div>
             
             <div className="p-8">
-              <div className="font-['Railroad Gothic'] text-lg text-[#ca5231]/80 mb-2">
+              <div className="font-['Railroad Gothic'] text-lg text-[#ca5231] mb-2">
                 {new Date(selectedNews.date).toLocaleDateString('fr-FR', {
                   day: 'numeric',
                   month: 'long',
@@ -241,11 +259,11 @@ const News: React.FC = () => {
                 })}
               </div>
               
-              <h3 className="text-2xl font-bold text-[#ca5231] mb-4 font-['Swiss 721 Black Extended BT']">
+              <h3 className="text-3xl font-bold text-[#ca5231] mb-6 font-['Swiss 721 Black Extended BT']">
                 {selectedNews.title}
               </h3>
               
-              <div className="prose prose-lg">
+              <div className="prose prose-lg max-w-none">
                 <p className="text-lg text-gray-700 font-['Rainy Days'] leading-relaxed whitespace-pre-line">
                   {selectedNews.description}
                 </p>

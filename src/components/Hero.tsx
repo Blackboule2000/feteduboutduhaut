@@ -9,7 +9,7 @@ interface PosterSettings {
 }
 
 const defaultPosterSettings: PosterSettings = {
-  image_url: 'http://www.image-heberg.fr/files/17472124523185540990.jpg',
+  image_url: 'https://i.ibb.co/FL3xY1gP/FDBH-2025-R-cup-r-R-cup-r-R-cup-r.jpg',
   alt_text: 'Affiche Fête du Bout du Haut 2025',
   enabled: true
 };

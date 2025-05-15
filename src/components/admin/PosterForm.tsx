@@ -19,13 +19,6 @@ const PosterForm: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [preview, setPreview] = useState<string>(defaultSettings.image_url);
-
-  useEffect(() => {
-    if (settings.image_url) {
-      setPreview(settings.image_url);
-    }
-  }, [settings.image_url]);
 
   useEffect(() => {
     loadSettings();
@@ -60,18 +53,6 @@ const PosterForm: React.FC = () => {
     }
   };
 
-  const validateImageUrl = async (url: string): Promise<boolean> => {
-    if (!url) return false;
-    
-    try {
-      const response = await fetch(url);
-      const contentType = response.headers.get('content-type');
-      return response.ok && (contentType?.startsWith('image/') || false);
-    } catch {
-      return false;
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -79,11 +60,6 @@ const PosterForm: React.FC = () => {
     setSuccess(false);
 
     try {
-      const isValidImage = await validateImageUrl(settings.image_url);
-      if (!isValidImage) {
-        throw new Error("L'URL fournie n'est pas une image valide");
-      }
-
       const { error } = await supabase
         .from('settings')
         .upsert({
@@ -97,16 +73,10 @@ const PosterForm: React.FC = () => {
       setTimeout(() => setSuccess(false), 3000);
     } catch (err) {
       console.error('Erreur lors de l\'enregistrement:', err);
-      setError(err instanceof Error ? err.message : 'Erreur lors de l\'enregistrement des paramètres');
-      setPreview(defaultSettings.image_url);
+      setError('Erreur lors de l\'enregistrement des paramètres');
     } finally {
       setLoading(false);
     }
-  };
-
-  const handleImageError = () => {
-    setPreview(defaultSettings.image_url);
-    setError("L'image n'a pas pu être chargée. Vérifiez l'URL.");
   };
 
   return (
@@ -137,16 +107,17 @@ const PosterForm: React.FC = () => {
               placeholder="https://..."
               required
             />
-            {preview && (
-              <div className="relative aspect-[3/4] max-w-md mx-auto">
-                <img
-                  src={preview}
-                  alt="Aperçu de l'affiche"
-                  className="w-full h-full object-contain rounded-lg shadow-lg"
-                  onError={handleImageError}
-                />
-              </div>
-            )}
+            <div className="relative aspect-[3/4] max-w-md mx-auto">
+              <img
+                src={settings.image_url}
+                alt="Aperçu de l'affiche"
+                className="w-full h-full object-contain rounded-lg shadow-lg"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement;
+                  target.src = defaultSettings.image_url;
+                }}
+              />
+            </div>
           </div>
         </div>
 

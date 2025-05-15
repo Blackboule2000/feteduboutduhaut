@@ -26,7 +26,6 @@ const PosterForm: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    // Mettre à jour la prévisualisation quand l'URL change
     if (settings.image_url) {
       setPreview(settings.image_url);
     }
@@ -43,7 +42,6 @@ const PosterForm: React.FC = () => {
       if (error) throw error;
 
       if (!data) {
-        // Si aucune donnée n'existe, créer avec les paramètres par défaut
         const { error: upsertError } = await supabase
           .from('settings')
           .upsert({
@@ -54,7 +52,6 @@ const PosterForm: React.FC = () => {
         if (upsertError) throw upsertError;
         setSettings(defaultSettings);
       } else {
-        // Fusionner avec les paramètres par défaut pour s'assurer que toutes les propriétés existent
         setSettings({ ...defaultSettings, ...data.value });
       }
     } catch (err) {
@@ -82,7 +79,6 @@ const PosterForm: React.FC = () => {
     setSuccess(false);
 
     try {
-      // Valider l'URL de l'image
       const isValidImage = await validateImageUrl(settings.image_url);
       if (!isValidImage) {
         throw new Error("L'URL fournie n'est pas une image valide");
@@ -102,7 +98,6 @@ const PosterForm: React.FC = () => {
     } catch (err) {
       console.error('Erreur lors de l\'enregistrement:', err);
       setError(err instanceof Error ? err.message : 'Erreur lors de l\'enregistrement des paramètres');
-      // En cas d'erreur, revenir à l'URL par défaut pour la prévisualisation
       setPreview(defaultSettings.image_url);
     } finally {
       setLoading(false);

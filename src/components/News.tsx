@@ -74,14 +74,25 @@ const News: React.FC = () => {
     );
   }
 
-  const handleNewsClick = (news: NewsItem, e: React.MouseEvent) => {
-    e.stopPropagation();
+  const handleNewsClick = (news: NewsItem) => {
     setSelectedNews(news);
   };
 
   const handleModalClose = () => {
     setSelectedNews(null);
   };
+
+  // Gestionnaire pour la touche Escape
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        handleModalClose();
+      }
+    };
+
+    window.addEventListener('keydown', handleEscape);
+    return () => window.removeEventListener('keydown', handleEscape);
+  }, []);
 
   return (
     <section id="actualités" className="py-20 relative overflow-hidden bg-[#f6d9a0]">
@@ -126,18 +137,17 @@ const News: React.FC = () => {
                     <div className="tape tape-left"></div>
                     <div className="tape tape-right"></div>
                     
-                    <div className="polaroid-image relative h-[70%] overflow-hidden mb-6 group cursor-pointer" onClick={(e) => handleNewsClick(news, e)}>
+                    <div 
+                      className="polaroid-image relative h-[70%] overflow-hidden mb-6 group cursor-pointer"
+                      onClick={() => handleNewsClick(news)}
+                    >
                       <img
                         src={news.image_url}
                         alt={news.title}
                         className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
-                        style={{
-                          animation: index === currentIndex ? 'subtle-zoom 20s infinite alternate' : 'none'
-                        }}
                       />
                       <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
                         <button
-                          onClick={(e) => handleNewsClick(news, e)}
                           className="bg-[#ca5231] text-white px-6 py-3 rounded-full transform -translate-y-4 group-hover:translate-y-0 transition-all duration-300 font-['Railroad Gothic'] text-lg hover:bg-[#ca5231]/80"
                         >
                           En savoir plus

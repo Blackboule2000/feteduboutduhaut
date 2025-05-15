@@ -59,9 +59,8 @@ const Schedule: React.FC = () => {
   };
 
   // Séparation des concerts par catégorie
-  const mainConcerts = program.filter(concert => 
-    concert.title === "MOTOLO" || concert.title === "ARBAS"
-  ).sort((a, b) => a.title === "MOTOLO" ? -1 : 1);
+  const motoloConcert = program.find(concert => concert.title === "MOTOLO");
+  const arbasConcert = program.find(concert => concert.title === "ARBAS");
   
   const otherConcerts = program.filter(concert => 
     concert.title !== "MOTOLO" && 
@@ -110,10 +109,10 @@ const Schedule: React.FC = () => {
     );
   };
 
-  const ConcertCard = ({ concert, isMain = false }: { concert: Program, isMain?: boolean }) => (
-    <div className={`relative group ${isMain ? 'transform hover:scale-102' : 'transform hover:scale-101'}`}>
+  const ConcertCard = ({ concert, isMotolo = false }: { concert: Program, isMotolo?: boolean }) => (
+    <div className={`relative group ${isMotolo ? 'transform hover:scale-103' : 'transform hover:scale-101'}`}>
       <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
-      <div className="concert-card bg-[#f6d9a0] rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative h-full">
+      <div className={`concert-card bg-[#f6d9a0] rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative h-full ${isMotolo ? 'p-2' : ''}`}>
         <div className="absolute inset-0 border-[12px] border-[#ca5231]/20 rounded-xl pointer-events-none"></div>
         <div className="absolute inset-[12px] border-[3px] border-[#ca5231]/30 rounded-lg pointer-events-none"></div>
         
@@ -122,7 +121,7 @@ const Schedule: React.FC = () => {
         <div className="absolute bottom-0 left-0 w-16 h-16 border-b-8 border-l-8 border-[#ca5231]/40 rounded-bl-xl"></div>
         <div className="absolute bottom-0 right-0 w-16 h-16 border-b-8 border-r-8 border-[#ca5231]/40 rounded-br-xl"></div>
 
-        <div className="relative p-8 flex flex-col h-full">
+        <div className={`relative p-8 flex flex-col h-full ${isMotolo ? 'p-10' : ''}`}>
           <div className="flex justify-between items-start mb-6">
             <div className="text-[#ca5231] text-2xl font-['Railroad Gothic'] bg-[#ca5231]/10 px-4 py-2 rounded-full">
               {concert.time}
@@ -142,7 +141,7 @@ const Schedule: React.FC = () => {
           </div>
 
           {concert.image_url && (
-            <div className="relative aspect-video mb-6 overflow-hidden rounded-xl shadow-xl">
+            <div className={`relative aspect-video mb-6 overflow-hidden rounded-xl shadow-xl ${isMotolo ? 'aspect-[16/9]' : ''}`}>
               <div className="absolute inset-0 bg-[#ca5231]/10"></div>
               <img 
                 src={concert.image_url} 
@@ -152,11 +151,11 @@ const Schedule: React.FC = () => {
             </div>
           )}
 
-          <h3 className={`font-['Swiss 721 Black Extended BT'] ${isMain ? 'text-4xl' : 'text-3xl'} text-[#ca5231] mb-4 text-center`}>
+          <h3 className={`font-['Swiss 721 Black Extended BT'] ${isMotolo ? 'text-5xl' : 'text-3xl'} text-[#ca5231] mb-4 text-center`}>
             {concert.title}
           </h3>
 
-          <p className="font-['Rainy Days'] text-[#ca5231]/80 mb-6 text-xl text-center flex-grow">
+          <p className={`font-['Rainy Days'] text-[#ca5231]/80 mb-6 ${isMotolo ? 'text-2xl' : 'text-xl'} text-center flex-grow`}>
             {concert.description}
           </p>
 
@@ -198,14 +197,19 @@ const Schedule: React.FC = () => {
           </p>
         </div>
 
-        {/* Têtes d'affiche */}
-        <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 mb-16">
-          {mainConcerts.map((concert) => (
-            <div key={concert.id} className="flex-1 min-w-0 max-w-[600px]">
-              <ConcertCard concert={concert} isMain={true} />
-            </div>
-          ))}
-        </div>
+        {/* MOTOLO en grand */}
+        {motoloConcert && (
+          <div className="mb-16 max-w-5xl mx-auto">
+            <ConcertCard concert={motoloConcert} isMotolo={true} />
+          </div>
+        )}
+
+        {/* ARBAS */}
+        {arbasConcert && (
+          <div className="max-w-3xl mx-auto mb-16">
+            <ConcertCard concert={arbasConcert} />
+          </div>
+        )}
 
         {/* Autres concerts */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">

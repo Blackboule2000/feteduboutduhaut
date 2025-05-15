@@ -61,8 +61,8 @@ const Schedule: React.FC = () => {
   const mainConcerts = program.filter(concert => 
     concert.title === "MOTOLO" || concert.title === "ARBAS"
   ).sort((a, b) => {
-    if (a.title === "MOTOLO" && b.title === "ARBAS") return 1;
     if (a.title === "ARBAS" && b.title === "MOTOLO") return -1;
+    if (a.title === "MOTOLO" && b.title === "ARBAS") return 1;
     return 0;
   });
   

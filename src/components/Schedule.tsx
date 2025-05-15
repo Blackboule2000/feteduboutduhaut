@@ -61,9 +61,7 @@ const Schedule: React.FC = () => {
   const mainConcerts = program.filter(concert => 
     concert.title === "MOTOLO" || concert.title === "ARBAS"
   ).sort((a, b) => {
-    if (a.title === "MOTOLO") return -1;
-    if (b.title === "MOTOLO") return 1;
-    return 0;
+    return a.title === "MOTOLO" ? -1 : 1;
   });
   
   const otherConcerts = program.filter(concert => 
@@ -195,9 +193,9 @@ const Schedule: React.FC = () => {
           </h2>
         </div>
 
-        <div className="flex flex-col md:flex-row gap-8 mb-24 max-w-7xl mx-auto">
+        <div className="flex flex-col md:flex-row justify-center items-stretch gap-8 mb-24">
           {mainConcerts.map((concert) => (
-            <div key={concert.id} className="w-full md:w-1/2">
+            <div key={concert.id} className="flex-1 min-w-0 max-w-[600px]">
               <ConcertCard concert={concert} isMain={true} />
             </div>
           ))}

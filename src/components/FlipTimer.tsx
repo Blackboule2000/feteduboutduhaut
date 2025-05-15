@@ -11,7 +11,7 @@ const TimerUnit: React.FC<TimerUnitProps> = ({ value, label }) => {
   return (
     <div className="flex flex-col items-center transform hover:scale-105 transition-transform duration-300">
       <div 
-        className="relative w-32 h-32 bg-[#f6d9a0] rounded-full border-4 border-[#ca5231] flex items-center justify-center shadow-lg"
+        className="relative w-20 md:w-32 h-20 md:h-32 bg-[#f6d9a0] rounded-full border-4 border-[#ca5231] flex items-center justify-center shadow-lg"
         style={{
           boxShadow: '0 4px 6px rgba(202, 82, 49, 0.1), 0 1px 3px rgba(202, 82, 49, 0.08)',
           transform: 'rotate(-2deg)'
@@ -35,7 +35,7 @@ const TimerUnit: React.FC<TimerUnitProps> = ({ value, label }) => {
           </svg>
         </div>
         <span 
-          className="text-5xl font-['Railroad Gothic'] text-[#ca5231] relative z-10"
+          className="text-3xl md:text-5xl font-['Railroad Gothic'] text-[#ca5231] relative z-10"
           style={{
             textShadow: '2px 2px 0px rgba(202, 82, 49, 0.2)'
           }}
@@ -44,7 +44,7 @@ const TimerUnit: React.FC<TimerUnitProps> = ({ value, label }) => {
         </span>
       </div>
       <span 
-        className="mt-4 text-xl font-['Swiss 721 Black Extended BT'] text-[#ca5231] tracking-wider"
+        className="mt-4 text-base md:text-xl font-['Swiss 721 Black Extended BT'] text-[#ca5231] tracking-wider"
         style={{
           textShadow: '1px 1px 0px rgba(202, 82, 49, 0.1)'
         }}
@@ -89,8 +89,7 @@ const FlipTimer: React.FC<FlipTimerProps> = ({ targetDate }) => {
 
   return (
     <div className="relative">
-      {/* Hirondelles autour du timer */}
-      <div className="absolute -top-20 -left-16 transform rotate-[25deg]">
+      <div className="absolute -top-20 -left-16 transform rotate-[25deg] hidden md:block">
         <img 
           src="http://www.image-heberg.fr/files/17472137482209719273.png" 
           alt="Hirondelle" 
@@ -98,7 +97,7 @@ const FlipTimer: React.FC<FlipTimerProps> = ({ targetDate }) => {
           style={{ opacity: 0.8 }}
         />
       </div>
-      <div className="absolute -top-24 right-20 transform -rotate-[15deg]">
+      <div className="absolute -top-24 right-20 transform -rotate-[15deg] hidden md:block">
         <img 
           src="http://www.image-heberg.fr/files/17472137482209719273.png" 
           alt="Hirondelle" 
@@ -106,7 +105,7 @@ const FlipTimer: React.FC<FlipTimerProps> = ({ targetDate }) => {
           style={{ opacity: 0.7, animationDelay: '1s' }}
         />
       </div>
-      <div className="absolute -top-16 right-[-4rem] transform rotate-[10deg]">
+      <div className="absolute -top-16 right-[-4rem] transform rotate-[10deg] hidden md:block">
         <img 
           src="http://www.image-heberg.fr/files/17472137482209719273.png" 
           alt="Hirondelle" 
@@ -115,7 +114,7 @@ const FlipTimer: React.FC<FlipTimerProps> = ({ targetDate }) => {
         />
       </div>
 
-      <div className="flex justify-center items-center gap-12 p-8">
+      <div className="flex flex-wrap justify-center items-center gap-4 md:gap-12 p-4 md:p-8">
         <TimerUnit value={timeLeft.days} label="JOURS" />
         <TimerUnit value={timeLeft.hours} label="HEURES" />
         <TimerUnit value={timeLeft.minutes} label="MINUTES" />

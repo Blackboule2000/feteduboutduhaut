@@ -268,7 +268,7 @@ const News: React.FC = () => {
             </div>
 
             <div className="p-8 pt-0">
-              <a href="#" className="polaroid-date mb-6 font-['Railroad Gothic'] text-xl text-[#ca5231] inline-block bg-[#ca5231]/10 px-4 py-2 rounded-full">
+              <a href="#" className="polaroid-date mb-6 font-['Railroad Gothic'] text-xl text-[#ca5231] inline-block bg-[#ca5231]/10 px-4 py-2 rounded-full hover:bg-[#ca5231]/20 transition-colors">
                 {new Date(selectedNews.date).toLocaleDateString('fr-FR', {
                   day: 'numeric',
                   month: 'long',
@@ -276,11 +276,11 @@ const News: React.FC = () => {
                 })}
               </a>
 
-              <a href="#" className="block text-4xl font-bold text-[#ca5231] mb-8 font-['Swiss 721 Black Extended BT'] hover:translate-x-2 transition-transform">
+              <a href="#" className="block text-4xl font-bold text-[#ca5231] mb-12 font-['Swiss 721 Black Extended BT'] hover:translate-x-2 transition-transform">
                 {selectedNews.title}
               </a>
 
-              <a href="#" className="block text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed whitespace-pre-line hover:text-[#ca5231] transition-colors">
+              <a href="#" className="block text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed whitespace-pre-line hover:text-[#ca5231] transition-colors mt-8">
                 {selectedNews.description}
               </a>
             </div>

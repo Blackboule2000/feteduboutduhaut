@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { getIcon } from '../data';
 import { supabase } from '../lib/supabase';
 import { ChevronLeft, ChevronRight, X } from 'lucide-react';
@@ -161,77 +161,73 @@ const Activities: React.FC = () => {
 
       {selectedActivity && (
         <div 
-          className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${
-            isModalEntering 
-              ? 'opacity-100 bg-black/60 backdrop-blur-sm' 
-              : 'opacity-0 bg-black/0 backdrop-blur-none'
-          }`}
+          className="fixed inset-0 z-50 flex items-center justify-center transition-all duration-500"
           onClick={closeModal}
         >
-          <button
-            onClick={closeModal}
-            className="absolute top-8 right-8 bg-[#f6d9a0] text-[#ca5231] p-2 rounded-full shadow-lg hover:bg-[#ca5231] hover:text-[#f6d9a0] transform hover:rotate-90 transition-all duration-300"
-          >
-            <X className="w-8 h-8" />
-          </button>
+          <div className={`absolute inset-0 bg-gradient-to-br from-[#ca5231]/95 to-[#f6d9a0]/95 backdrop-blur-lg transition-opacity duration-500 ${
+            isModalEntering ? 'opacity-100' : 'opacity-0'
+          }`}></div>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              navigateModal('prev');
-            }}
-            className="absolute left-8 top-1/2 -translate-y-1/2 bg-[#f6d9a0] text-[#ca5231] p-2 rounded-full shadow-lg hover:bg-[#ca5231] hover:text-[#f6d9a0] transform hover:scale-110 transition-all duration-300"
-          >
-            <ChevronLeft className="w-8 h-8" />
-          </button>
+          <div className={`relative w-full max-w-6xl mx-4 bg-white rounded-2xl shadow-2xl overflow-hidden transition-all duration-500 transform ${
+            isModalEntering ? 'translate-y-0 opacity-100 scale-100' : 'translate-y-8 opacity-0 scale-95'
+          }`} onClick={e => e.stopPropagation()}>
+            <button
+              onClick={closeModal}
+              className="absolute top-4 right-4 z-50 bg-white/10 backdrop-blur-sm text-white p-2 rounded-full hover:bg-white/20 transition-all duration-300"
+            >
+              <X className="w-6 h-6" />
+            </button>
 
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              navigateModal('next');
-            }}
-            className="absolute right-8 top-1/2 -translate-y-1/2 bg-[#f6d9a0] text-[#ca5231] p-2 rounded-full shadow-lg hover:bg-[#ca5231] hover:text-[#f6d9a0] transform hover:scale-110 transition-all duration-300"
-          >
-            <ChevronRight className="w-8 h-8" />
-          </button>
-
-          <div 
-            className={`polaroid-card max-w-4xl w-full max-h-[90vh] overflow-y-auto relative transform ${
-              isModalEntering 
-                ? 'translate-y-0 opacity-100 scale-100 rotate-0' 
-                : 'translate-y-8 opacity-0 scale-95 rotate-2'
-            } transition-all duration-500 bg-[#f6d9a0]`}
-            onClick={(e) => e.stopPropagation()}
-          >
-            <div className="tape tape-top"></div>
-            <div className="tape tape-left"></div>
-            <div className="tape tape-right"></div>
-
-            <div className="relative aspect-video mb-8 rounded-lg overflow-hidden shadow-xl">
-              <img
-                src={selectedActivity.image_url}
-                alt={selectedActivity.name}
-                className="w-full h-full object-cover"
-              />
+            <div className="relative h-[50vh] overflow-hidden">
+              {selectedActivity.image_url && (
+                <img
+                  src={selectedActivity.image_url}
+                  alt={selectedActivity.name}
+                  className="w-full h-full object-cover"
+                />
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+              
+              <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
+                <div className="flex items-center space-x-4 mb-4">
+                  <div className="bg-[#ca5231] p-3 rounded-full">
+                    {getIcon(selectedActivity.icon)({ className: "h-6 w-6 text-white" })}
+                  </div>
+                  <span className="font-['Railroad Gothic'] text-2xl">
+                    {selectedActivity.time}
+                  </span>
+                </div>
+                <h3 className="font-['Swiss 721 Black Extended BT'] text-4xl mb-2">
+                  {selectedActivity.name}
+                </h3>
+              </div>
             </div>
 
-            <div className="p-8 pt-0">
-              <a href="#" className="polaroid-date mb-6 font-['Railroad Gothic'] text-xl text-[#ca5231] inline-block bg-[#ca5231]/10 px-4 py-2 rounded-full hover:bg-[#ca5231]/20 transition-colors">
-                {selectedActivity.time}
-              </a>
-
-              <div className="flex items-center space-x-4 mb-12">
-                <div className="bg-[#ca5231] p-4 rounded-full">
-                  {getIcon(selectedActivity.icon)({ className: "h-8 w-8 text-[#f6d9a0]" })}
-                </div>
-                <a href="#" className="block text-4xl font-bold text-[#ca5231] font-['Swiss 721 Black Extended BT'] hover:translate-x-2 transition-transform">
-                  {selectedActivity.name}
-                </a>
-              </div>
-
-              <a href="#" className="block text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed whitespace-pre-line hover:text-[#ca5231] transition-colors mt-8">
+            <div className="p-8 bg-white">
+              <p className="font-['Rainy Days'] text-xl text-[#ca5231]/80 leading-relaxed">
                 {selectedActivity.description}
-              </a>
+              </p>
+            </div>
+
+            <div className="absolute top-1/2 -translate-y-1/2 flex justify-between w-full px-4 pointer-events-none">
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigateModal('prev');
+                }}
+                className="pointer-events-auto bg-white/10 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110"
+              >
+                <ChevronLeft className="w-6 h-6" />
+              </button>
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  navigateModal('next');
+                }}
+                className="pointer-events-auto bg-white/10 backdrop-blur-sm text-white p-3 rounded-full hover:bg-white/20 transition-all duration-300 transform hover:scale-110"
+              >
+                <ChevronRight className="w-6 h-6" />
+              </button>
             </div>
           </div>
         </div>

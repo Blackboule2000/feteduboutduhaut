@@ -15,16 +15,12 @@ const News: React.FC = () => {
   const [newsData, setNewsData] = useState<NewsItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
+  const [selectedNewsIndex, setSelectedNewsIndex] = useState<number>(0);
   const [isModalEntering, setIsModalEntering] = useState(false);
 
   useEffect(() => {
     loadNews();
   }, []);
-
-  useEffect(() => {
-    const timer = setInterval(nextSlide, 8000);
-    return () => clearInterval(timer);
-  }, [newsData.length]);
 
   useEffect(() => {
     const handleEscape = (e: KeyboardEvent) => {
@@ -67,6 +63,8 @@ const News: React.FC = () => {
   };
 
   const openModal = (news: NewsItem) => {
+    const index = newsData.findIndex(item => item.id === news.id);
+    setSelectedNewsIndex(index);
     setSelectedNews(news);
     setIsModalEntering(true);
     document.body.style.overflow = 'hidden';
@@ -78,6 +76,15 @@ const News: React.FC = () => {
       setSelectedNews(null);
       document.body.style.overflow = '';
     }, 300);
+  };
+
+  const navigateModal = (direction: 'prev' | 'next') => {
+    const newIndex = direction === 'next' 
+      ? (selectedNewsIndex + 1) % newsData.length
+      : selectedNewsIndex === 0 ? newsData.length - 1 : selectedNewsIndex - 1;
+    
+    setSelectedNewsIndex(newIndex);
+    setSelectedNews(newsData[newIndex]);
   };
 
   if (loading) {
@@ -215,9 +222,29 @@ const News: React.FC = () => {
         >
           <button
             onClick={closeModal}
-            className="absolute top-4 right-4 bg-[#f6d9a0] text-[#ca5231] p-2 rounded-full shadow-lg hover:bg-[#ca5231] hover:text-[#f6d9a0] transform hover:rotate-90 transition-all duration-300"
+            className="absolute top-8 right-8 bg-[#f6d9a0] text-[#ca5231] p-2 rounded-full shadow-lg hover:bg-[#ca5231] hover:text-[#f6d9a0] transform hover:rotate-90 transition-all duration-300"
           >
             <X className="w-8 h-8" />
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigateModal('prev');
+            }}
+            className="absolute left-8 top-1/2 -translate-y-1/2 bg-[#f6d9a0] text-[#ca5231] p-2 rounded-full shadow-lg hover:bg-[#ca5231] hover:text-[#f6d9a0] transform hover:scale-110 transition-all duration-300"
+          >
+            <ChevronLeft className="w-8 h-8" />
+          </button>
+
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              navigateModal('next');
+            }}
+            className="absolute right-8 top-1/2 -translate-y-1/2 bg-[#f6d9a0] text-[#ca5231] p-2 rounded-full shadow-lg hover:bg-[#ca5231] hover:text-[#f6d9a0] transform hover:scale-110 transition-all duration-300"
+          >
+            <ChevronRight className="w-8 h-8" />
           </button>
 
           <div 
@@ -232,7 +259,15 @@ const News: React.FC = () => {
             <div className="tape tape-left"></div>
             <div className="tape tape-right"></div>
 
-            <div className="p-8">
+            <div className="relative aspect-video mb-8 rounded-lg overflow-hidden shadow-xl">
+              <img
+                src={selectedNews.image_url}
+                alt={selectedNews.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+
+            <div className="p-8 pt-0">
               <a href="#" className="polaroid-date mb-6 font-['Railroad Gothic'] text-xl text-[#ca5231] inline-block bg-[#ca5231]/10 px-4 py-2 rounded-full">
                 {new Date(selectedNews.date).toLocaleDateString('fr-FR', {
                   day: 'numeric',
@@ -244,14 +279,6 @@ const News: React.FC = () => {
               <a href="#" className="block text-4xl font-bold text-[#ca5231] mb-8 font-['Swiss 721 Black Extended BT'] hover:translate-x-2 transition-transform">
                 {selectedNews.title}
               </a>
-
-              <div className="relative aspect-video mb-8 rounded-lg overflow-hidden shadow-xl">
-                <img
-                  src={selectedNews.image_url}
-                  alt={selectedNews.title}
-                  className="w-full h-full object-cover"
-                />
-              </div>
 
               <a href="#" className="block text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed whitespace-pre-line hover:text-[#ca5231] transition-colors">
                 {selectedNews.description}

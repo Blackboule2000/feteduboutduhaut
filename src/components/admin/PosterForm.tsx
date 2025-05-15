@@ -22,14 +22,14 @@ const PosterForm: React.FC = () => {
   const [preview, setPreview] = useState<string>(defaultSettings.image_url);
 
   useEffect(() => {
-    loadSettings();
-  }, []);
-
-  useEffect(() => {
     if (settings.image_url) {
       setPreview(settings.image_url);
     }
   }, [settings.image_url]);
+
+  useEffect(() => {
+    loadSettings();
+  }, []);
 
   const loadSettings = async () => {
     try {

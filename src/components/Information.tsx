@@ -314,7 +314,7 @@ const Information: React.FC = () => {
                     href={partner.website_url || '#'} 
                     target="_blank" 
                     rel="noopener noreferrer"
-                    className="bg-[#f6d9a0] rounded-lg p-4 flex items-center justify-center h-32 transform hover:scale-105 transition-all duration-300 group"
+                    className="bg-white rounded-lg p-4 flex items-center justify-center h-32 transform hover:scale-105 transition-all duration-300 group shadow-md hover:shadow-lg"
                   >
                     <img 
                       src={partner.logo_url} 

@@ -115,29 +115,29 @@ const Schedule: React.FC = () => {
   const ConcertCard = ({ concert, isMain = false }: { concert: Program, isMain?: boolean }) => (
     <div className={`relative group ${isMain ? 'transform hover:scale-105' : 'transform hover:scale-102'}`}>
       <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
-      <div className={`concert-card ${isMain ? 'bg-[#ca5231] text-[#f6d9a0]' : 'bg-[#f6d9a0]'} rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative`}>
-        <div className={`absolute inset-0 border-[12px] ${isMain ? 'border-[#f6d9a0]/20' : 'border-[#ca5231]/20'} rounded-xl pointer-events-none`}></div>
-        <div className={`absolute inset-[12px] border-[3px] ${isMain ? 'border-[#f6d9a0]/30' : 'border-[#ca5231]/30'} rounded-lg pointer-events-none`}></div>
+      <div className="concert-card bg-[#f6d9a0] rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative">
+        <div className="absolute inset-0 border-[12px] border-[#ca5231]/20 rounded-xl pointer-events-none"></div>
+        <div className="absolute inset-[12px] border-[3px] border-[#ca5231]/30 rounded-lg pointer-events-none"></div>
         
-        <div className="absolute top-0 left-0 w-16 h-16 border-t-8 border-l-8 border-[#f6d9a0]/40 rounded-tl-xl"></div>
-        <div className="absolute top-0 right-0 w-16 h-16 border-t-8 border-r-8 border-[#f6d9a0]/40 rounded-tr-xl"></div>
-        <div className="absolute bottom-0 left-0 w-16 h-16 border-b-8 border-l-8 border-[#f6d9a0]/40 rounded-bl-xl"></div>
-        <div className="absolute bottom-0 right-0 w-16 h-16 border-b-8 border-r-8 border-[#f6d9a0]/40 rounded-br-xl"></div>
+        <div className="absolute top-0 left-0 w-16 h-16 border-t-8 border-l-8 border-[#ca5231]/40 rounded-tl-xl"></div>
+        <div className="absolute top-0 right-0 w-16 h-16 border-t-8 border-r-8 border-[#ca5231]/40 rounded-tr-xl"></div>
+        <div className="absolute bottom-0 left-0 w-16 h-16 border-b-8 border-l-8 border-[#ca5231]/40 rounded-bl-xl"></div>
+        <div className="absolute bottom-0 right-0 w-16 h-16 border-b-8 border-r-8 border-[#ca5231]/40 rounded-br-xl"></div>
 
         <div className="relative p-8">
           <div className="flex justify-between items-start mb-6">
-            <div className={`text-2xl font-['Railroad Gothic'] ${isMain ? 'bg-[#f6d9a0] text-[#ca5231]' : 'bg-[#ca5231]/10 text-[#ca5231]'} px-4 py-2 rounded-full`}>
+            <div className="text-[#ca5231] text-2xl font-['Railroad Gothic'] bg-[#ca5231]/10 px-4 py-2 rounded-full">
               {concert.time}
             </div>
-            <div className={`flex items-center ${isMain ? 'bg-[#f6d9a0] text-[#ca5231]' : 'bg-[#ca5231]/10 text-[#ca5231]'} px-4 py-2 rounded-full`}>
+            <div className="flex items-center bg-[#ca5231]/10 px-4 py-2 rounded-full">
               {concert.stage === "Grande Scène" ? (
-                <Star className="w-5 h-5 mr-2" />
+                <Star className="w-5 h-5 text-[#ca5231] mr-2" />
               ) : concert.stage === "Scène à Vélo" ? (
-                <Bike className="w-5 h-5 mr-2" />
+                <Bike className="w-5 h-5 text-[#ca5231] mr-2" />
               ) : (
-                <Music className="w-5 h-5 mr-2" />
+                <Music className="w-5 h-5 text-[#ca5231] mr-2" />
               )}
-              <span className="text-lg font-['Railroad Gothic']">
+              <span className="text-lg text-[#ca5231] font-['Railroad Gothic']">
                 {concert.stage}
               </span>
             </div>
@@ -145,7 +145,7 @@ const Schedule: React.FC = () => {
 
           {concert.image_url && (
             <div className="relative aspect-video mb-6 overflow-hidden rounded-xl shadow-xl">
-              <div className={`absolute inset-0 ${isMain ? 'bg-[#f6d9a0]/10' : 'bg-[#ca5231]/10'}`}></div>
+              <div className="absolute inset-0 bg-[#ca5231]/10"></div>
               <img 
                 src={concert.image_url} 
                 alt={concert.title}
@@ -154,11 +154,11 @@ const Schedule: React.FC = () => {
             </div>
           )}
 
-          <h3 className={`font-['Swiss 721 Black Extended BT'] ${isMain ? 'text-5xl' : 'text-3xl'} ${isMain ? 'text-[#f6d9a0]' : 'text-[#ca5231]'} mb-4 text-center`}>
+          <h3 className={`font-['Swiss 721 Black Extended BT'] ${isMain ? 'text-4xl' : 'text-3xl'} text-[#ca5231] mb-4 text-center`}>
             {concert.title}
           </h3>
 
-          <p className={`font-['Rainy Days'] ${isMain ? 'text-[#f6d9a0]/90' : 'text-[#ca5231]/80'} mb-6 text-xl text-center`}>
+          <p className="font-['Rainy Days'] text-[#ca5231]/80 mb-6 text-xl text-center">
             {concert.description}
           </p>
 
@@ -217,23 +217,11 @@ const Schedule: React.FC = () => {
           <h3 className="font-['Swiss 721 Black Extended BT'] text-3xl mb-8 text-[#ca5231]">HORAIRES DES CONCERTS</h3>
           <div className="space-y-4">
             {program.map((concert) => (
-              <div key={concert.id} className={`flex justify-between items-center p-4 ${
-                concert.title === "MOTOLO" || concert.title === "ARBAS" 
-                  ? 'bg-[#ca5231] text-[#f6d9a0] rounded-lg' 
-                  : 'hover:bg-white/30 rounded-lg transition-colors duration-300'
-              }`}>
-                <span className="font-['Railroad Gothic'] text-2xl">{concert.title}</span>
+              <div key={concert.id} className="flex justify-between items-center p-4 hover:bg-white/30 rounded-lg transition-colors duration-300">
+                <span className="font-['Railroad Gothic'] text-[#ca5231] text-2xl">{concert.title}</span>
                 <div className="flex items-center">
-                  <span className={`font-['Railroad Gothic'] ${
-                    concert.title === "MOTOLO" || concert.title === "ARBAS"
-                      ? 'text-[#f6d9a0]'
-                      : 'text-festival-turquoise'
-                  } mr-4 text-2xl`}>{concert.time}</span>
-                  <span className={`text-lg ${
-                    concert.title === "MOTOLO" || concert.title === "ARBAS"
-                      ? 'text-[#f6d9a0]/80'
-                      : 'text-[#ca5231]/80'
-                  } font-['Rainy Days'] italic`}>({concert.stage})</span>
+                  <span className="font-['Railroad Gothic'] text-festival-turquoise mr-4 text-2xl">{concert.time}</span>
+                  <span className="text-lg text-[#ca5231]/80 font-['Rainy Days'] italic">({concert.stage})</span>
                 </div>
               </div>
             ))}

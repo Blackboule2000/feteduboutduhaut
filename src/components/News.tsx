@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, X, ArrowLeft } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface NewsItem {
@@ -226,11 +226,6 @@ const News: React.FC = () => {
             <div className="tape tape-top"></div>
             <div className="tape tape-left"></div>
             <div className="tape tape-right"></div>
-            <div className="tape tape-bottom"></div>
-
-            {/* Motif rétro et bruit */}
-            <div className="absolute inset-0 bg-retro-pattern opacity-10"></div>
-            <div className="absolute inset-0 bg-noise opacity-20"></div>
 
             <div className="relative p-8">
               <button

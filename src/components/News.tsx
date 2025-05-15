@@ -204,7 +204,6 @@ const News: React.FC = () => {
         </div>
       </div>
 
-      {/* Modal avec style polaroid */}
       {selectedNews && (
         <div 
           className={`fixed inset-0 z-50 flex items-center justify-center p-4 transition-all duration-300 ${
@@ -214,7 +213,6 @@ const News: React.FC = () => {
           }`}
           onClick={closeModal}
         >
-          {/* Bouton de fermeture flottant */}
           <button
             onClick={closeModal}
             className="absolute top-4 right-4 bg-[#f6d9a0] text-[#ca5231] p-2 rounded-full shadow-lg hover:bg-[#ca5231] hover:text-[#f6d9a0] transform hover:rotate-90 transition-all duration-300"
@@ -230,23 +228,22 @@ const News: React.FC = () => {
             } transition-all duration-500 bg-[#f6d9a0]`}
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Bandes de scotch */}
             <div className="tape tape-top"></div>
             <div className="tape tape-left"></div>
             <div className="tape tape-right"></div>
 
             <div className="p-8">
-              <div className="polaroid-date mb-6 font-['Railroad Gothic'] text-xl text-[#ca5231] inline-block bg-[#ca5231]/10 px-4 py-2 rounded-full">
+              <a href="#" className="polaroid-date mb-6 font-['Railroad Gothic'] text-xl text-[#ca5231] inline-block bg-[#ca5231]/10 px-4 py-2 rounded-full">
                 {new Date(selectedNews.date).toLocaleDateString('fr-FR', {
                   day: 'numeric',
                   month: 'long',
                   year: 'numeric'
                 })}
-              </div>
+              </a>
 
-              <h3 className="text-4xl font-bold text-[#ca5231] mb-8 font-['Swiss 721 Black Extended BT']">
+              <a href="#" className="block text-4xl font-bold text-[#ca5231] mb-8 font-['Swiss 721 Black Extended BT'] hover:translate-x-2 transition-transform">
                 {selectedNews.title}
-              </h3>
+              </a>
 
               <div className="relative aspect-video mb-8 rounded-lg overflow-hidden shadow-xl">
                 <img
@@ -256,9 +253,9 @@ const News: React.FC = () => {
                 />
               </div>
 
-              <p className="text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed whitespace-pre-line">
+              <a href="#" className="block text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed whitespace-pre-line hover:text-[#ca5231] transition-colors">
                 {selectedNews.description}
-              </p>
+              </a>
             </div>
           </div>
         </div>

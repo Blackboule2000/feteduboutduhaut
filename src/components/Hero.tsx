@@ -16,7 +16,7 @@ interface HomeSettings {
     date: string;
     time: string;
   };
-  birds: {
+  birds?: {
     enabled: boolean;
     quantity: number;
   };
@@ -98,9 +98,9 @@ const Hero: React.FC = () => {
       <div className="absolute inset-0 bg-retro-pattern opacity-10"></div>
       <div className="absolute inset-0 bg-noise opacity-20"></div>
       
-      {settings.birds.enabled && (
+      {settings.birds?.enabled && (
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {renderBirds(settings.birds.quantity)}
+          {renderBirds(settings.birds?.quantity ?? 6)}
         </div>
       )}
       

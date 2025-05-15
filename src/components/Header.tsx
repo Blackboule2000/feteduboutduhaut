@@ -144,7 +144,7 @@ const Header: React.FC = () => {
         <div className="flex justify-between items-center relative">
           {settings.decorative_elements.show_birds && (
             <>
-              <div className="absolute left-24 -top-6">
+              <div className="absolute left-24 -top-6 hidden md:block">
                 <img 
                   src={settings.decorative_elements.bird_image_url}
                   alt="Hirondelle" 
@@ -152,7 +152,7 @@ const Header: React.FC = () => {
                   style={{ opacity: 0.7 }}
                 />
               </div>
-              <div className="absolute left-40 -top-4">
+              <div className="absolute left-40 -top-4 hidden md:block">
                 <img 
                   src={settings.decorative_elements.bird_image_url}
                   alt="Hirondelle" 
@@ -160,7 +160,7 @@ const Header: React.FC = () => {
                   style={{ opacity: 0.6 }}
                 />
               </div>
-              <div className="absolute left-52 -top-2">
+              <div className="absolute left-52 -top-2 hidden md:block">
                 <img 
                   src={settings.decorative_elements.bird_image_url}
                   alt="Hirondelle" 
@@ -168,7 +168,7 @@ const Header: React.FC = () => {
                   style={{ opacity: 0.5 }}
                 />
               </div>
-              <div className="absolute right-48 -top-8">
+              <div className="absolute right-48 -top-8 hidden md:block">
                 <img 
                   src={settings.decorative_elements.bird_image_url}
                   alt="Hirondelle" 
@@ -176,7 +176,7 @@ const Header: React.FC = () => {
                   style={{ opacity: 0.6 }}
                 />
               </div>
-              <div className="absolute right-36 -top-4">
+              <div className="absolute right-36 -top-4 hidden md:block">
                 <img 
                   src={settings.decorative_elements.bird_image_url}
                   alt="Hirondelle" 
@@ -184,7 +184,7 @@ const Header: React.FC = () => {
                   style={{ opacity: 0.5 }}
                 />
               </div>
-              <div className="absolute right-28 -top-6">
+              <div className="absolute right-28 -top-6 hidden md:block">
                 <img 
                   src={settings.decorative_elements.bird_image_url}
                   alt="Hirondelle" 
@@ -195,7 +195,7 @@ const Header: React.FC = () => {
             </>
           )}
           
-          <div className="flex items-center">
+          <div className="flex items-center flex-1 md:flex-none">
             <Link 
               to={settings.logo.link_url}
               className="flex items-center space-x-4 group"
@@ -209,7 +209,7 @@ const Header: React.FC = () => {
                 <div className="absolute inset-0 bg-white/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
               </div>
               <span 
-                className="hidden md:block font-['Swiss 721 Black Extended BT'] text-2xl uppercase tracking-wider font-bold"
+                className="font-['Swiss 721 Black Extended BT'] text-lg md:text-2xl uppercase tracking-wider font-bold truncate"
                 style={{ color: settings.styles.text_color }}
               >
                 {settings.title.text}

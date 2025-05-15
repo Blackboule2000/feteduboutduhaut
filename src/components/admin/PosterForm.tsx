@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Save, Upload } from 'lucide-react';
-import { uploadMedia } from '../../lib/media';
+import { Save } from 'lucide-react';
 
 interface PosterSettings {
   image_url: string;
@@ -79,24 +78,6 @@ const PosterForm: React.FC = () => {
     }
   };
 
-  const handleImageUpload = async (file: File) => {
-    try {
-      const path = `poster/${Date.now()}_${file.name}`;
-      const url = await uploadMedia(file, path);
-      
-      setSettings({
-        ...settings,
-        image_url: url
-      });
-      
-      setSuccess(true);
-      setTimeout(() => setSuccess(false), 3000);
-    } catch (err) {
-      console.error('Erreur lors de l\'upload:', err);
-      setError('Erreur lors du téléchargement de l\'image');
-    }
-  };
-
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {error && (
@@ -133,18 +114,6 @@ const PosterForm: React.FC = () => {
                 />
               </div>
             )}
-            <div className="flex items-center space-x-2">
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => {
-                  const file = e.target.files?.[0];
-                  if (file) handleImageUpload(file);
-                }}
-                className="flex-1"
-              />
-              <Upload className="h-5 w-5 text-yellow-600" />
-            </div>
           </div>
         </div>
 

@@ -75,6 +75,7 @@ const HeroForm: React.FC = () => {
 
       if (error) {
         if (error.code === 'PGRST116') {
+          // Si les paramètres n'existent pas, on les crée avec les valeurs par défaut
           const { error: insertError } = await supabase
             .from('settings')
             .insert({
@@ -96,35 +97,6 @@ const HeroForm: React.FC = () => {
     } catch (err) {
       console.error('Erreur lors du chargement des paramètres:', err);
       setError('Erreur lors du chargement des paramètres');
-    }
-  };
-
-  const handleImageUpload = async (file: File | null, type: 'main' | 'poster') => {
-    if (!file) {
-      setError('Aucun fichier sélectionné');
-      return;
-    }
-
-    setError(null);
-    setUploadLoading(prev => ({ ...prev, [type]: true }));
-
-    try {
-      const path = `hero/${type}_${Date.now()}_${file.name}`;
-      const url = await uploadMedia(file, path);
-      
-      if (!url) {
-        throw new Error('URL de l\'image non reçue');
-      }
-
-      setSettings(prev => ({
-        ...prev,
-        [type === 'main' ? 'main_image' : 'poster_image']: url
-      }));
-    } catch (err) {
-      console.error('Erreur lors de l\'upload:', err);
-      setError(err instanceof Error ? err.message : 'Erreur lors du téléchargement du fichier');
-    } finally {
-      setUploadLoading(prev => ({ ...prev, [type]: false }));
     }
   };
 
@@ -150,6 +122,50 @@ const HeroForm: React.FC = () => {
       setError('Erreur lors de l\'enregistrement des paramètres');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleImageUpload = async (file: File | null, type: 'main' | 'poster') => {
+    if (!file) {
+      setError('Aucun fichier sélectionné');
+      return;
+    }
+
+    setError(null);
+    setUploadLoading(prev => ({ ...prev, [type]: true }));
+
+    try {
+      const path = `hero/${type}_${Date.now()}_${file.name}`;
+      const url = await uploadMedia(file, path);
+      
+      if (!url) {
+        throw new Error('URL de l\'image non reçue');
+      }
+
+      const { error } = await supabase
+        .from('settings')
+        .upsert({
+          key: 'hero_settings',
+          value: {
+            ...settings,
+            [type === 'main' ? 'main_image' : 'poster_image']: url
+          }
+        });
+
+      if (error) throw error;
+
+      setSettings(prev => ({
+        ...prev,
+        [type === 'main' ? 'main_image' : 'poster_image']: url
+      }));
+
+      setSuccess(true);
+      setTimeout(() => setSuccess(false), 3000);
+    } catch (err) {
+      console.error('Erreur lors de l\'upload:', err);
+      setError(err instanceof Error ? err.message : 'Erreur lors du téléchargement du fichier');
+    } finally {
+      setUploadLoading(prev => ({ ...prev, [type]: false }));
     }
   };
 

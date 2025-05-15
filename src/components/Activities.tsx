@@ -137,7 +137,7 @@ const Activities: React.FC = () => {
                     )}
                     <div className="flex items-start space-x-4">
                       <div className="bg-[#ca5231] p-3 rounded-full">
-                        <IconComponent className="h-6 w-6 text-[#f6d9a0]" />
+                        {IconComponent && <IconComponent className="h-6 w-6 text-[#f6d9a0]" />}
                       </div>
                       <div>
                         <h3 className="font-['Swiss 721 Black Extended BT'] text-xl text-[#ca5231] mb-1">
@@ -191,7 +191,10 @@ const Activities: React.FC = () => {
               <div className="absolute bottom-0 left-0 right-0 p-8 text-white">
                 <div className="flex items-center space-x-4 mb-4">
                   <div className="bg-[#ca5231] p-3 rounded-full">
-                    {getIcon(selectedActivity.icon)({ className: "h-6 w-6 text-white" })}
+                    {(() => {
+                      const IconComponent = getIcon(selectedActivity.icon);
+                      return IconComponent && <IconComponent className="h-6 w-6 text-white" />;
+                    })()}
                   </div>
                   <span className="font-['Railroad Gothic'] text-2xl">
                     {selectedActivity.time}

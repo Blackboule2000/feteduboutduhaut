@@ -99,7 +99,7 @@ const News: React.FC = () => {
         </div>
 
         <div className="max-w-4xl mx-auto relative">
-          {/* Points de navigation déplacés en haut */}
+          {/* Points de navigation en haut */}
           <div className="flex justify-center space-x-2 mb-8">
             {newsData.map((_, index) => (
               <button
@@ -108,7 +108,7 @@ const News: React.FC = () => {
                   setCurrentIndex(index);
                   setExpandedId(null);
                 }}
-                className={`w-3 h-3 rounded-full transition-all duration-300 transform hover:scale-125 ${
+                className={`w-4 h-4 rounded-full transition-all duration-300 transform hover:scale-125 ${
                   index === currentIndex 
                     ? 'bg-[#ca5231] scale-110' 
                     : 'bg-[#ca5231]/30 hover:bg-[#ca5231]/50'
@@ -141,7 +141,6 @@ const News: React.FC = () => {
                     className={`polaroid-card h-full transform hover:rotate-1 transition-all duration-500 bg-[#f6d9a0] cursor-pointer ${
                       isExpanded ? 'scale-105' : ''
                     }`}
-                    onClick={() => toggleExpand(news.id)}
                   >
                     <div className="tape tape-top"></div>
                     <div className="tape tape-left"></div>
@@ -171,7 +170,7 @@ const News: React.FC = () => {
                       <div className={`relative overflow-hidden transition-all duration-500 ${
                         isExpanded ? 'max-h-[500px]' : 'max-h-[100px]'
                       }`}>
-                        <p className="text-xl text-[#ca5231]/80 transform hover:translate-y-[-2px] transition-transform font-['Rainy Days'] leading-relaxed">
+                        <p className="text-xl text-[#ca5231]/80 font-['Rainy Days'] leading-relaxed">
                           {news.description}
                         </p>
                         <div className={`absolute bottom-0 left-0 right-0 h-12 bg-gradient-to-t from-[#f6d9a0] to-transparent ${
@@ -179,19 +178,19 @@ const News: React.FC = () => {
                         }`}></div>
                       </div>
                       <button 
-                        className="mt-6 inline-flex items-center px-6 py-2 bg-[#ca5231] text-white rounded-full hover:bg-[#ca5231]/80 transition-colors text-lg font-['Railroad Gothic']"
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleExpand(news.id);
                         }}
+                        className="mt-6 inline-flex items-center px-8 py-3 bg-[#ca5231] text-white rounded-full hover:bg-[#ca5231]/80 transition-all duration-300 transform hover:scale-105 text-xl font-['Railroad Gothic'] shadow-lg"
                       >
                         {isExpanded ? (
                           <>
-                            Voir moins <ChevronUp className="ml-2 w-5 h-5" />
+                            Voir moins <ChevronUp className="ml-2 w-6 h-6" />
                           </>
                         ) : (
                           <>
-                            Lire la suite <ChevronDown className="ml-2 w-5 h-5" />
+                            Lire la suite <ChevronDown className="ml-2 w-6 h-6" />
                           </>
                         )}
                       </button>
@@ -204,16 +203,16 @@ const News: React.FC = () => {
 
           <button
             onClick={prevSlide}
-            className="absolute left-4 top-1/2 -translate-y-1/2 bg-[#f6d9a0]/80 backdrop-blur-sm shadow-lg hover:bg-[#ca5231]/10 text-[#ca5231] p-4 rounded-full z-30 transition-all duration-300 transform hover:scale-110"
+            className="absolute left-4 top-1/2 -translate-y-1/2 bg-[#ca5231] text-white p-4 rounded-full z-30 transition-all duration-300 transform hover:scale-110 shadow-lg hover:bg-[#ca5231]/80"
           >
-            <ChevronLeft className="w-6 h-6" />
+            <ChevronLeft className="w-8 h-8" />
           </button>
 
           <button
             onClick={nextSlide}
-            className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#f6d9a0]/80 backdrop-blur-sm shadow-lg hover:bg-[#ca5231]/10 text-[#ca5231] p-4 rounded-full z-30 transition-all duration-300 transform hover:scale-110"
+            className="absolute right-4 top-1/2 -translate-y-1/2 bg-[#ca5231] text-white p-4 rounded-full z-30 transition-all duration-300 transform hover:scale-110 shadow-lg hover:bg-[#ca5231]/80"
           >
-            <ChevronRight className="w-6 h-6" />
+            <ChevronRight className="w-8 h-8" />
           </button>
         </div>
       </div>

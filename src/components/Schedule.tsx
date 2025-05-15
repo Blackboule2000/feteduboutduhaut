@@ -195,13 +195,13 @@ const Schedule: React.FC = () => {
           </h2>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24 max-w-7xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24 max-w-7xl mx-auto">
           {mainConcerts.map((concert) => (
             <ConcertCard key={concert.id} concert={concert} isMain={true} />
           ))}
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-24">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
           {otherConcerts.map((concert) => (
             <ConcertCard key={concert.id} concert={concert} />
           ))}

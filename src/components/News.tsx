@@ -41,14 +41,14 @@ const News: React.FC = () => {
     setCurrentIndex((prevIndex) => 
       prevIndex === newsData.length - 1 ? 0 : prevIndex + 1
     );
-    setExpandedId(null); // Reset expanded state on slide change
+    setExpandedId(null);
   };
 
   const prevSlide = () => {
     setCurrentIndex((prevIndex) => 
       prevIndex === 0 ? newsData.length - 1 : prevIndex - 1
     );
-    setExpandedId(null); // Reset expanded state on slide change
+    setExpandedId(null);
   };
 
   const toggleExpand = (id: string) => {
@@ -99,6 +99,24 @@ const News: React.FC = () => {
         </div>
 
         <div className="max-w-4xl mx-auto relative">
+          {/* Points de navigation déplacés en haut */}
+          <div className="flex justify-center space-x-2 mb-8">
+            {newsData.map((_, index) => (
+              <button
+                key={index}
+                onClick={() => {
+                  setCurrentIndex(index);
+                  setExpandedId(null);
+                }}
+                className={`w-3 h-3 rounded-full transition-all duration-300 transform hover:scale-125 ${
+                  index === currentIndex 
+                    ? 'bg-[#ca5231] scale-110' 
+                    : 'bg-[#ca5231]/30 hover:bg-[#ca5231]/50'
+                }`}
+              />
+            ))}
+          </div>
+
           <div className="relative h-[700px] overflow-hidden">
             {newsData.map((news, index) => {
               const tapeRotation = Math.random() * 6 - 3;
@@ -161,7 +179,7 @@ const News: React.FC = () => {
                         }`}></div>
                       </div>
                       <button 
-                        className="mt-4 inline-flex items-center text-[#ca5231] hover:text-[#ca5231]/80 transition-colors"
+                        className="mt-6 inline-flex items-center px-6 py-2 bg-[#ca5231] text-white rounded-full hover:bg-[#ca5231]/80 transition-colors text-lg font-['Railroad Gothic']"
                         onClick={(e) => {
                           e.stopPropagation();
                           toggleExpand(news.id);
@@ -169,11 +187,11 @@ const News: React.FC = () => {
                       >
                         {isExpanded ? (
                           <>
-                            Voir moins <ChevronUp className="ml-1 w-4 h-4" />
+                            Voir moins <ChevronUp className="ml-2 w-5 h-5" />
                           </>
                         ) : (
                           <>
-                            Lire la suite <ChevronDown className="ml-1 w-4 h-4" />
+                            Lire la suite <ChevronDown className="ml-2 w-5 h-5" />
                           </>
                         )}
                       </button>
@@ -197,20 +215,6 @@ const News: React.FC = () => {
           >
             <ChevronRight className="w-6 h-6" />
           </button>
-
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-2 z-30">
-            {newsData.map((_, index) => (
-              <button
-                key={index}
-                onClick={() => setCurrentIndex(index)}
-                className={`w-3 h-3 rounded-full transition-all duration-300 transform hover:scale-125 ${
-                  index === currentIndex 
-                    ? 'bg-[#ca5231] scale-110' 
-                    : 'bg-[#ca5231]/30 hover:bg-[#ca5231]/50'
-                }`}
-              />
-            ))}
-          </div>
         </div>
       </div>
     </section>

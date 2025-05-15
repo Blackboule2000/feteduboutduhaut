@@ -1,32 +1,29 @@
 import { supabase } from './supabase';
 
-// Keep track of geolocation failures to prevent excessive retries
 let geoLocationFailures = 0;
 const MAX_FAILURES = 3;
 
 const getLocationData = async (ip: string) => {
-  // If we've had too many failures, skip geolocation
   if (geoLocationFailures >= MAX_FAILURES) {
-    console.warn('Geolocation disabled due to repeated failures');
     return null;
   }
 
   const APIs = [
     {
+      url: `https://ipapi.co/${ip}/json/`,
+      transform: (data: any) => ({
+        country: data.country_name,
+        region: data.region,
+        city: data.city,
+        latitude: data.latitude,
+        longitude: data.longitude
+      })
+    },
+    {
       url: `https://ip-api.com/json/${ip}?fields=status,message,country,regionName,city,lat,lon`,
       transform: (data: any) => ({
         country: data.country,
         region: data.regionName,
-        city: data.city,
-        latitude: data.lat,
-        longitude: data.lon
-      })
-    },
-    {
-      url: `https://extreme-ip-lookup.com/json/${ip}`,
-      transform: (data: any) => ({
-        country: data.country,
-        region: data.region,
         city: data.city,
         latitude: data.lat,
         longitude: data.lon
@@ -47,19 +44,17 @@ const getLocationData = async (ip: string) => {
       const data = await response.json();
       
       if (data.status === 'success' || (data.country && data.city)) {
-        // Reset failures counter on success
         geoLocationFailures = 0;
         return api.transform(data);
       }
     } catch (error) {
-      console.warn(`Geolocation API failed: ${api.url}`, error);
-      continue; // Try next API
+      console.warn(`API de géolocalisation échouée: ${api.url}`, error);
+      continue;
     }
   }
 
-  // If we get here, all APIs failed
   geoLocationFailures++;
-  console.warn(`Geolocation attempt ${geoLocationFailures} of ${MAX_FAILURES} failed`);
+  console.warn(`Tentative de géolocalisation ${geoLocationFailures} sur ${MAX_FAILURES} échouée`);
   return null;
 };
 
@@ -74,20 +69,18 @@ export const trackPageView = async (page: string) => {
 
     let locationData = null;
     try {
-      // Get visitor's IP via HTTPS
       const ipResponse = await fetch('https://api.ipify.org?format=json', {
         signal: AbortSignal.timeout(5000)
       });
       
       if (!ipResponse.ok) {
-        throw new Error(`HTTP error! status: ${ipResponse.status}`);
+        throw new Error(`Erreur HTTP! status: ${ipResponse.status}`);
       }
       
       const { ip } = await ipResponse.json();
       locationData = await getLocationData(ip);
     } catch (error) {
-      console.warn('Error getting IP or location data:', error);
-      // Continue with the page view tracking even if geolocation fails
+      console.warn('Erreur lors de la récupération de l\'IP ou des données de localisation:', error);
     }
 
     const { data, error } = await supabase
@@ -98,11 +91,9 @@ export const trackPageView = async (page: string) => {
         user_agent: navigator.userAgent,
         referrer: document.referrer,
         session_duration: sessionDuration,
-        // Only include location data if available
         ...(locationData && {
           country: locationData.country,
           region: locationData.region,
-          
           city: locationData.city,
           latitude: locationData.latitude,
           longitude: locationData.longitude
@@ -112,7 +103,7 @@ export const trackPageView = async (page: string) => {
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Error tracking page view:', error);
+    console.error('Erreur lors du suivi de la page:', error);
     return null;
   }
 };

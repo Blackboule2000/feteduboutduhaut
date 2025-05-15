@@ -1,6 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Upload, Save } from 'lucide-react';
+import { Save, Upload } from 'lucide-react';
 import { uploadMedia } from '../../lib/media';
 
 interface HeroSettings {
@@ -71,7 +71,6 @@ const HeroForm: React.FC = () => {
 
       if (error) {
         if (error.code === 'PGRST116') {
-          // Si les paramètres n'existent pas, les créer avec les valeurs par défaut
           const { error: insertError } = await supabase
             .from('settings')
             .insert({
@@ -85,7 +84,6 @@ const HeroForm: React.FC = () => {
           throw error;
         }
       } else if (data?.value) {
-        // Ensure all required properties exist by merging with defaultSettings
         setSettings({
           ...defaultSettings,
           ...data.value
@@ -277,7 +275,7 @@ const HeroForm: React.FC = () => {
             </label>
             <input
               type="url"
-              value={settings.social_links?.facebook ?? ''}
+              value={settings.social_links.facebook}
               onChange={(e) => setSettings({
                 ...settings,
                 social_links: { 
@@ -295,7 +293,7 @@ const HeroForm: React.FC = () => {
             </label>
             <input
               type="url"
-              value={settings.social_links?.instagram ?? ''}
+              value={settings.social_links.instagram}
               onChange={(e) => setSettings({
                 ...settings,
                 social_links: { 
@@ -316,7 +314,7 @@ const HeroForm: React.FC = () => {
           <div className="flex items-center">
             <input
               type="checkbox"
-              checked={settings.cta_button?.enabled ?? false}
+              checked={settings.cta_button.enabled}
               onChange={(e) => setSettings({
                 ...settings,
                 cta_button: { 
@@ -330,7 +328,7 @@ const HeroForm: React.FC = () => {
               Afficher le bouton d'action
             </label>
           </div>
-          {settings.cta_button?.enabled && (
+          {settings.cta_button.enabled && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-yellow-700 mb-1">
@@ -338,7 +336,7 @@ const HeroForm: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  value={settings.cta_button?.text ?? ''}
+                  value={settings.cta_button.text}
                   onChange={(e) => setSettings({
                     ...settings,
                     cta_button: { 
@@ -355,7 +353,7 @@ const HeroForm: React.FC = () => {
                 </label>
                 <input
                   type="text"
-                  value={settings.cta_button?.url ?? ''}
+                  value={settings.cta_button.url}
                   onChange={(e) => setSettings({
                     ...settings,
                     cta_button: { 
@@ -377,7 +375,7 @@ const HeroForm: React.FC = () => {
           <div className="flex items-center">
             <input
               type="checkbox"
-              checked={settings.countdown?.enabled ?? false}
+              checked={settings.countdown.enabled}
               onChange={(e) => setSettings({
                 ...settings,
                 countdown: { 
@@ -391,7 +389,7 @@ const HeroForm: React.FC = () => {
               Afficher le compte à rebours
             </label>
           </div>
-          {settings.countdown?.enabled && (
+          {settings.countdown.enabled && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-yellow-700 mb-1">
@@ -399,7 +397,7 @@ const HeroForm: React.FC = () => {
                 </label>
                 <input
                   type="datetime-local"
-                  value={settings.countdown?.target_date ?? ''}
+                  value={settings.countdown.target_date}
                   onChange={(e) => setSettings({
                     ...settings,
                     countdown: { 
@@ -416,7 +414,7 @@ const HeroForm: React.FC = () => {
                 </label>
                 <input
                   type="color"
-                  value={settings.countdown?.background_color ?? '#f6d9a0'}
+                  value={settings.countdown.background_color}
                   onChange={(e) => setSettings({
                     ...settings,
                     countdown: { 

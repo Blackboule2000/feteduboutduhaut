@@ -69,7 +69,8 @@ const HeroForm: React.FC = () => {
         if (upsertError) throw upsertError;
         setSettings(defaultSettings);
       } else if (data) {
-        setSettings(data.value);
+        // Ensure all required properties exist by merging with defaultSettings
+        setSettings({ ...defaultSettings, ...data.value });
       }
     } catch (err) {
       console.error('Erreur lors du chargement des paramètres:', err);
@@ -296,7 +297,7 @@ const HeroForm: React.FC = () => {
             </label>
             <input
               type="url"
-              value={settings.social_links.facebook}
+              value={settings.social_links?.facebook || ''}
               onChange={(e) => setSettings({
                 ...settings,
                 social_links: { 
@@ -314,7 +315,7 @@ const HeroForm: React.FC = () => {
             </label>
             <input
               type="url"
-              value={settings.social_links.instagram}
+              value={settings.social_links?.instagram || ''}
               onChange={(e) => setSettings({
                 ...settings,
                 social_links: { 
@@ -335,7 +336,7 @@ const HeroForm: React.FC = () => {
           <div className="flex items-center">
             <input
               type="checkbox"
-              checked={settings.countdown.enabled}
+              checked={settings.countdown?.enabled || false}
               onChange={(e) => setSettings({
                 ...settings,
                 countdown: { 
@@ -349,14 +350,14 @@ const HeroForm: React.FC = () => {
               Afficher le compte à rebours
             </label>
           </div>
-          {settings.countdown.enabled && (
+          {settings.countdown?.enabled && (
             <div>
               <label className="block text-sm font-medium text-yellow-700 mb-2">
                 Date et heure cible
               </label>
               <input
                 type="datetime-local"
-                value={settings.countdown.target_date}
+                value={settings.countdown?.target_date || ''}
                 onChange={(e) => setSettings({
                   ...settings,
                   countdown: { 

@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import 'leaflet/dist/leaflet.css';
 import { supabase } from '../../lib/supabase';
+import { MessageSquare, Users, Globe, Clock } from 'lucide-react';
 
 interface VisitorLocation {
   city: string;
@@ -22,6 +23,15 @@ interface DeviceData {
   count: number;
 }
 
+interface ContactMessage {
+  id: string;
+  name: string;
+  email: string;
+  message: string;
+  created_at: string;
+  read: boolean;
+}
+
 const COLORS = ['#ca5231', '#f6d9a0', '#365d66', '#8B4513', '#6B8E23'];
 
 const VisitorsMap: React.FC = () => {
@@ -31,30 +41,49 @@ const VisitorsMap: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [totalVisits, setTotalVisits] = useState(0);
   const [dailyStats, setDailyStats] = useState<{ date: string; visits: number }[]>([]);
+  const [unreadMessages, setUnreadMessages] = useState<ContactMessage[]>([]);
+  const [averageSessionDuration, setAverageSessionDuration] = useState(0);
 
   useEffect(() => {
     loadStatistics();
-    const interval = setInterval(loadStatistics, 5 * 60 * 1000); // Refresh every 5 minutes
+    const interval = setInterval(loadStatistics, 60000); // Actualisation toutes les minutes
     return () => clearInterval(interval);
   }, []);
 
   const loadStatistics = async () => {
     try {
-      // Load location data
+      // Charger les messages non lus
+      const { data: messages } = await supabase
+        .from('contact_messages')
+        .select('*')
+        .eq('read', false)
+        .order('created_at', { ascending: false });
+
+      if (messages) {
+        setUnreadMessages(messages);
+      }
+
+      // Charger les données de localisation
       const { data: locationData } = await supabase
         .from('stats')
-        .select('city, region, country, latitude, longitude, view_count')
+        .select('city, region, country, latitude, longitude, view_count, session_duration')
         .not('latitude', 'is', null)
         .not('longitude', 'is', null);
 
       if (locationData) {
+        // Calculer la durée moyenne des sessions
+        const totalDuration = locationData.reduce((sum, curr) => sum + (curr.session_duration || 0), 0);
+        const avgDuration = totalDuration / locationData.length || 0;
+        setAverageSessionDuration(Math.round(avgDuration));
+
+        // Agréger les données de localisation
         const locationMap = locationData.reduce((acc: Record<string, VisitorLocation>, curr) => {
           const key = `${curr.latitude}-${curr.longitude}`;
           if (!acc[key]) {
             acc[key] = {
-              city: curr.city || 'Unknown',
-              region: curr.region || 'Unknown',
-              country: curr.country || 'Unknown',
+              city: curr.city || 'Inconnue',
+              region: curr.region || 'Inconnue',
+              country: curr.country || 'Inconnue',
               count: 0,
               coordinates: [curr.latitude, curr.longitude]
             };
@@ -68,10 +97,11 @@ const VisitorsMap: React.FC = () => {
         setTotalVisits(locations.reduce((sum, loc) => sum + loc.count, 0));
       }
 
-      // Load page statistics
+      // Charger les statistiques par page
       const { data: pageData } = await supabase
         .from('stats')
-        .select('page_view, view_count');
+        .select('page_view, view_count')
+        .order('created_at', { ascending: false });
 
       if (pageData) {
         const pageStats = pageData.reduce((acc: Record<string, number>, curr) => {
@@ -86,10 +116,11 @@ const VisitorsMap: React.FC = () => {
         })));
       }
 
-      // Load device statistics
+      // Charger les statistiques par appareil
       const { data: deviceData } = await supabase
         .from('stats')
-        .select('user_agent, view_count');
+        .select('user_agent, view_count')
+        .order('created_at', { ascending: false });
 
       if (deviceData) {
         const deviceStats = deviceData.reduce((acc: Record<string, number>, curr) => {
@@ -104,18 +135,22 @@ const VisitorsMap: React.FC = () => {
         })));
       }
 
-      // Load daily statistics
+      // Charger les statistiques quotidiennes
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
       const { data: dailyData } = await supabase
         .from('stats')
         .select('created_at, view_count')
-        .gte('created_at', thirtyDaysAgo.toISOString());
+        .gte('created_at', thirtyDaysAgo.toISOString())
+        .order('created_at', { ascending: true });
 
       if (dailyData) {
         const dailyStats = dailyData.reduce((acc: Record<string, number>, curr) => {
-          const date = new Date(curr.created_at).toLocaleDateString();
+          const date = new Date(curr.created_at).toLocaleDateString('fr-FR', {
+            day: '2-digit',
+            month: '2-digit'
+          });
           acc[date] = (acc[date] || 0) + (curr.view_count || 1);
           return acc;
         }, {});
@@ -132,6 +167,12 @@ const VisitorsMap: React.FC = () => {
     }
   };
 
+  const formatDuration = (seconds: number): string => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}m ${remainingSeconds}s`;
+  };
+
   if (loading) {
     return (
       <div className="h-[600px] w-full rounded-lg overflow-hidden shadow-lg bg-gray-50 flex items-center justify-center">
@@ -142,27 +183,73 @@ const VisitorsMap: React.FC = () => {
 
   return (
     <div className="space-y-8">
-      {/* General Statistics */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      {/* Statistiques générales */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-yellow-900 mb-2">Visites totales</h3>
-          <p className="text-3xl font-bold text-yellow-600">{totalVisits}</p>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-yellow-900">Visites totales</h3>
+            <Users className="h-6 w-6 text-yellow-600" />
+          </div>
+          <p className="text-3xl font-bold text-yellow-600 mt-2">{totalVisits}</p>
+          <p className="text-sm text-gray-500 mt-1">Depuis le début</p>
         </div>
+
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-yellow-900 mb-2">Pays différents</h3>
-          <p className="text-3xl font-bold text-yellow-600">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-yellow-900">Messages non lus</h3>
+            <MessageSquare className="h-6 w-6 text-yellow-600" />
+          </div>
+          <p className="text-3xl font-bold text-yellow-600 mt-2">{unreadMessages.length}</p>
+          <p className="text-sm text-gray-500 mt-1">À traiter</p>
+        </div>
+
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-yellow-900">Pays différents</h3>
+            <Globe className="h-6 w-6 text-yellow-600" />
+          </div>
+          <p className="text-3xl font-bold text-yellow-600 mt-2">
             {new Set(locations.map(loc => loc.country)).size}
           </p>
+          <p className="text-sm text-gray-500 mt-1">Visiteurs internationaux</p>
         </div>
+
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-yellow-900 mb-2">Villes différentes</h3>
-          <p className="text-3xl font-bold text-yellow-600">
-            {new Set(locations.map(loc => loc.city)).size}
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-yellow-900">Durée moyenne</h3>
+            <Clock className="h-6 w-6 text-yellow-600" />
+          </div>
+          <p className="text-3xl font-bold text-yellow-600 mt-2">
+            {formatDuration(averageSessionDuration)}
           </p>
+          <p className="text-sm text-gray-500 mt-1">Par session</p>
         </div>
       </div>
 
-      {/* Visitors Map */}
+      {/* Messages non lus */}
+      {unreadMessages.length > 0 && (
+        <div className="bg-white p-6 rounded-lg shadow-md">
+          <h3 className="text-lg font-semibold text-yellow-900 mb-4">Derniers messages non lus</h3>
+          <div className="space-y-4">
+            {unreadMessages.map((message) => (
+              <div key={message.id} className="border-l-4 border-yellow-500 pl-4 py-2">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <h4 className="font-semibold text-yellow-900">{message.name}</h4>
+                    <p className="text-sm text-gray-600">{message.email}</p>
+                  </div>
+                  <span className="text-sm text-gray-500">
+                    {new Date(message.created_at).toLocaleDateString('fr-FR')}
+                  </span>
+                </div>
+                <p className="mt-2 text-gray-700">{message.message}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Carte des visiteurs */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-lg font-semibold text-yellow-900 mb-4">Carte des visiteurs</h3>
         <div className="h-[400px] relative">
@@ -201,9 +288,9 @@ const VisitorsMap: React.FC = () => {
         </div>
       </div>
 
-      {/* Charts */}
+      {/* Graphiques */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Page Statistics */}
+        {/* Statistiques par page */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-yellow-900 mb-4">Visites par page</h3>
           <div className="h-[300px]">
@@ -223,7 +310,7 @@ const VisitorsMap: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile/Desktop Distribution */}
+        {/* Répartition Mobile/Desktop */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-yellow-900 mb-4">Répartition Mobile/Desktop</h3>
           <div className="h-[300px] flex items-center justify-center">
@@ -247,11 +334,11 @@ const VisitorsMap: React.FC = () => {
           </div>
         </div>
 
-        {/* Visits Evolution */}
+        {/* Évolution des visites */}
         <div className="bg-white p-6 rounded-lg shadow-md md:col-span-2">
           <h3 className="text-lg font-semibold text-yellow-900 mb-4">Évolution des visites</h3>
           <div className="h-[300px]">
-            <BarChart
+            <LineChart
               width={1000}
               height={300}
               data={dailyStats}
@@ -262,8 +349,14 @@ const VisitorsMap: React.FC = () => {
               <YAxis />
               <Tooltip />
               <Legend />
-              <Bar dataKey="visits" fill="#365d66" />
-            </BarChart>
+              <Line 
+                type="monotone" 
+                dataKey="visits" 
+                stroke="#ca5231" 
+                strokeWidth={2}
+                dot={{ fill: '#ca5231' }}
+              />
+            </LineChart>
           </div>
         </div>
       </div>

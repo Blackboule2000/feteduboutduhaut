@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Mail, Phone, Facebook, Instagram } from 'lucide-react';
+import { supabase } from '../lib/supabase';
 
 const Contact: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -18,18 +19,11 @@ const Contact: React.FC = () => {
     setSuccess(false);
 
     try {
-      const response = await fetch(`${import.meta.env.VITE_SUPABASE_URL}/functions/v1/contact`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${import.meta.env.VITE_SUPABASE_ANON_KEY}`
-        },
-        body: JSON.stringify(formData)
-      });
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert([formData]);
 
-      if (!response.ok) {
-        throw new Error('Erreur lors de l\'envoi du message');
-      }
+      if (error) throw error;
 
       setSuccess(true);
       setFormData({ name: '', email: '', message: '' });

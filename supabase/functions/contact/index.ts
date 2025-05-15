@@ -1,11 +1,16 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { SmtpClient } from "npm:nodemailer";
+import { createClient } from "npm:@supabase/supabase-js@2.39.7";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Methods": "POST, OPTIONS",
   "Access-Control-Allow-Headers": "Content-Type, Authorization",
 };
+
+const supabase = createClient(
+  Deno.env.get("SUPABASE_URL") ?? "",
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
+);
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -31,15 +36,14 @@ serve(async (req) => {
       );
     }
 
-    // Enregistrement du message dans la base de données
-    const { data, error } = await supabase
+    const { error } = await supabase
       .from('contact_messages')
       .insert([{ name, email, message }]);
 
     if (error) throw error;
 
     return new Response(
-      JSON.stringify({ message: "Message enregistré avec succès" }),
+      JSON.stringify({ message: "Message envoyé avec succès" }),
       {
         headers: {
           ...corsHeaders,

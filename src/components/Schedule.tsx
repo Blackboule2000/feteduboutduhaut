@@ -1,18 +1,74 @@
-import React from 'react';
-import { concertData } from '../data';
+import React, { useState, useEffect } from 'react';
 import { Music, Bike, Star } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+
+interface Program {
+  id: string;
+  time: string;
+  title: string;
+  description: string;
+  stage: string;
+  order_index: number;
+  image_url?: string;
+  video_url?: string;
+  audio_url?: string;
+  color?: string;
+}
 
 const Schedule: React.FC = () => {
-  const mainConcerts = concertData.filter(concert => 
-    concert.name === "MOTOLO" || concert.name === "ARBAS"
-  ).sort((a, b) => a.name === "MOTOLO" ? -1 : 1); // Ensure MOTOLO comes first
+  const [program, setProgram] = useState<Program[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadProgram();
+
+    // Abonnement aux changements en temps réel
+    const channel = supabase
+      .channel('program_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'program'
+        },
+        () => {
+          loadProgram();
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, []);
+
+  const loadProgram = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('program')
+        .select('*')
+        .order('order_index', { ascending: true });
+
+      if (error) throw error;
+      if (data) setProgram(data);
+    } catch (err) {
+      console.error('Erreur lors du chargement du programme:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const mainConcerts = program.filter(concert => 
+    concert.title === "MOTOLO" || concert.title === "ARBAS"
+  ).sort((a, b) => a.title === "MOTOLO" ? -1 : 1);
   
-  const otherConcerts = concertData.filter(concert => 
-    concert.name !== "MOTOLO" && 
-    concert.name !== "ARBAS" && 
-    concert.name !== "Anna Rudy & Paul Lazarus"
+  const otherConcerts = program.filter(concert => 
+    concert.title !== "MOTOLO" && 
+    concert.title !== "ARBAS" && 
+    concert.title !== "Anna Rudy & Paul Lazarus"
   );
-  const afterParty = concertData.find(concert => concert.name === "Anna Rudy & Paul Lazarus");
+  const afterParty = program.find(concert => concert.title === "Anna Rudy & Paul Lazarus");
 
   const AudioPlayer = ({ url }: { url: string | null }) => {
     if (!url) return null;
@@ -53,22 +109,19 @@ const Schedule: React.FC = () => {
     );
   };
 
-  const ConcertCard = ({ concert, isMain = false }: { concert: any, isMain?: boolean }) => (
+  const ConcertCard = ({ concert, isMain = false }: { concert: Program, isMain?: boolean }) => (
     <div className={`relative group ${isMain ? 'transform hover:scale-105' : 'transform hover:scale-102'}`}>
       <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>
       <div className="concert-card bg-[#f6d9a0] rounded-xl overflow-hidden transform transition-all duration-500 hover:rotate-1 relative">
-        {/* Bordure ornementale */}
         <div className="absolute inset-0 border-[12px] border-[#ca5231]/20 rounded-xl pointer-events-none"></div>
         <div className="absolute inset-[12px] border-[3px] border-[#ca5231]/30 rounded-lg pointer-events-none"></div>
         
-        {/* Coins ornementaux */}
         <div className="absolute top-0 left-0 w-16 h-16 border-t-8 border-l-8 border-[#ca5231]/40 rounded-tl-xl"></div>
         <div className="absolute top-0 right-0 w-16 h-16 border-t-8 border-r-8 border-[#ca5231]/40 rounded-tr-xl"></div>
         <div className="absolute bottom-0 left-0 w-16 h-16 border-b-8 border-l-8 border-[#ca5231]/40 rounded-bl-xl"></div>
         <div className="absolute bottom-0 right-0 w-16 h-16 border-b-8 border-r-8 border-[#ca5231]/40 rounded-br-xl"></div>
 
         <div className="relative p-8">
-          {/* En-tête de la carte */}
           <div className="flex justify-between items-start mb-6">
             <div className="text-[#ca5231] text-2xl font-['Railroad Gothic'] bg-[#ca5231]/10 px-4 py-2 rounded-full">
               {concert.time}
@@ -87,46 +140,41 @@ const Schedule: React.FC = () => {
             </div>
           </div>
 
-          {/* Image du groupe */}
-          <div className="relative aspect-video mb-6 overflow-hidden rounded-xl shadow-xl">
-            <div className="absolute inset-0 bg-[#ca5231]/10"></div>
-            <img 
-              src={concert.image} 
-              alt={concert.name}
-              className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
-            />
-          </div>
+          {concert.image_url && (
+            <div className="relative aspect-video mb-6 overflow-hidden rounded-xl shadow-xl">
+              <div className="absolute inset-0 bg-[#ca5231]/10"></div>
+              <img 
+                src={concert.image_url} 
+                alt={concert.title}
+                className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-110"
+              />
+            </div>
+          )}
 
-          {/* Nom du groupe */}
           <h3 className={`font-['Swiss 721 Black Extended BT'] ${isMain ? 'text-4xl' : 'text-3xl'} text-[#ca5231] mb-4 text-center`}>
-            {concert.name}
+            {concert.title}
           </h3>
 
-          {/* Description */}
           <p className="font-['Rainy Days'] text-[#ca5231]/80 mb-6 text-xl text-center">
             {concert.description}
           </p>
 
-          {/* Lecteurs média */}
-          <AudioPlayer url={concert.audio_url} />
+          <AudioPlayer url={concert.audio_url || null} />
           <VideoPlayer url={concert.video_url} />
         </div>
       </div>
     </div>
   );
 
-  const sortConcerts = (concerts: any[]) => {
-    return concerts.sort((a, b) => {
-      // Convertir les heures en minutes pour la comparaison
-      const getMinutes = (time: string) => {
-        const [hours] = time.split(' - ')[0].split(':').map(Number);
-        // Si l'heure est 00, c'est minuit donc on ajoute 24h
-        return hours === 0 ? 24 * 60 : hours * 60;
-      };
-      
-      return getMinutes(b.time) - getMinutes(a.time);
-    });
-  };
+  if (loading) {
+    return (
+      <section id="programme" className="relative py-20 bg-festival-turquoise overflow-hidden">
+        <div className="container mx-auto px-4">
+          <div className="text-center text-white">Chargement du programme...</div>
+        </div>
+      </section>
+    );
+  }
 
   return (
     <section id="programme" className="relative py-20 bg-festival-turquoise overflow-hidden">
@@ -144,34 +192,30 @@ const Schedule: React.FC = () => {
           </h2>
         </div>
 
-        {/* Concerts principaux */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-12 mb-24 max-w-7xl mx-auto">
           {mainConcerts.map((concert) => (
             <ConcertCard key={concert.id} concert={concert} isMain={true} />
           ))}
         </div>
 
-        {/* Autres concerts */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12 mb-24">
-          {sortConcerts(otherConcerts).map((concert) => (
+          {otherConcerts.map((concert) => (
             <ConcertCard key={concert.id} concert={concert} />
           ))}
         </div>
 
-        {/* After Party */}
         {afterParty && (
           <div className="max-w-3xl mx-auto mb-24">
             <ConcertCard concert={afterParty} />
           </div>
         )}
         
-        {/* Horaires */}
         <div className="mt-16 bg-[#f6d9a0]/90 backdrop-blur-sm rounded-xl p-8 text-center max-w-3xl mx-auto transform hover:rotate-1 transition-transform duration-300">
           <h3 className="font-['Swiss 721 Black Extended BT'] text-3xl mb-8 text-[#ca5231]">HORAIRES DES CONCERTS</h3>
           <div className="space-y-4">
-            {sortConcerts([...mainConcerts, ...otherConcerts, afterParty]).map((concert) => (
+            {program.map((concert) => (
               <div key={concert.id} className="flex justify-between items-center p-4 hover:bg-white/30 rounded-lg transition-colors duration-300">
-                <span className="font-['Railroad Gothic'] text-[#ca5231] text-2xl">{concert.name}</span>
+                <span className="font-['Railroad Gothic'] text-[#ca5231] text-2xl">{concert.title}</span>
                 <div className="flex items-center">
                   <span className="font-['Railroad Gothic'] text-festival-turquoise mr-4 text-2xl">{concert.time}</span>
                   <span className="text-lg text-[#ca5231]/80 font-['Rainy Days'] italic">({concert.stage})</span>

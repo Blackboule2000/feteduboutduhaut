@@ -7,7 +7,7 @@ interface HomeSettings {
     url: string;
     alt: string;
   };
-  poster: {
+  poster?: {
     url: string;
     alt: string;
   };
@@ -133,15 +133,17 @@ const Hero: React.FC = () => {
         </div>
       )}
 
-      <div className="container mx-auto px-4 z-10">
-        <div className="max-w-4xl mx-auto relative">
-          <img 
-            src={settings.poster.url}
-            alt={settings.poster.alt}
-            className="w-full h-auto rounded-lg shadow-2xl mb-12"
-          />
+      {settings.poster && (
+        <div className="container mx-auto px-4 z-10">
+          <div className="max-w-4xl mx-auto relative">
+            <img 
+              src={settings.poster.url}
+              alt={settings.poster.alt}
+              className="w-full h-auto rounded-lg shadow-2xl mb-12"
+            />
+          </div>
         </div>
-      </div>
+      )}
     </section>
   );
 };

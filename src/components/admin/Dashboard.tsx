@@ -1,16 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Settings, BarChart, Home, Newspaper, Activity, ListOrdered, Info, Users, Layout } from 'lucide-react';
+import { LogOut, Settings, BarChart, Newspaper, Activity, Info, Users, Layout } from 'lucide-react';
 import NewsForm from './NewsForm';
 import ActivityForm from './ActivityForm';
 import VisitorsMap from './VisitorsMap';
 import CustomizationForm from './CustomizationForm';
-import HeroForm from './HeroForm';
+import HeaderForm from './HeaderForm';
 import ProgramForm from './ProgramForm';
 import InformationForm from './InformationForm';
 import PartnersForm from './PartnersForm';
-import HeaderForm from './HeaderForm';
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -61,8 +60,7 @@ function Dashboard() {
             {[
               { id: 'overview', name: 'Vue d\'ensemble', icon: BarChart },
               { id: 'header', name: 'Bandeau', icon: Layout },
-              { id: 'home', name: 'Page d\'accueil', icon: Home },
-              { id: 'program', name: 'Programme', icon: ListOrdered },
+              { id: 'program', name: 'Programme', icon: Activity },
               { id: 'news', name: 'Actualités', icon: Newspaper },
               { id: 'activities', name: 'Activités', icon: Activity },
               { id: 'information', name: 'Informations', icon: Info },
@@ -101,15 +99,6 @@ function Dashboard() {
                 <h2 className="text-xl font-bold text-yellow-900">Gestion du bandeau</h2>
               </div>
               <HeaderForm />
-            </div>
-          )}
-
-          {activeTab === 'home' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-yellow-900">Gestion de la page d'accueil</h2>
-              </div>
-              <HeroForm />
             </div>
           )}
 

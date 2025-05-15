@@ -1,7 +1,41 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { Mail, Phone, Facebook, Instagram, Leaf, Recycle, Truck, Info, Calendar, Clock, MapPin, Tent } from 'lucide-react';
+import { supabase } from '../lib/supabase';
+
+interface Partner {
+  id: string;
+  name: string;
+  logo_url: string;
+  website_url: string | null;
+  order_index: number;
+  is_active: boolean;
+}
 
 const Information: React.FC = () => {
+  const [partners, setPartners] = useState<Partner[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadPartners();
+  }, []);
+
+  const loadPartners = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('partners')
+        .select('*')
+        .eq('is_active', true)
+        .order('order_index', { ascending: true });
+
+      if (error) throw error;
+      if (data) setPartners(data);
+    } catch (err) {
+      console.error('Erreur lors du chargement des partenaires:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <section id="infos" className="py-20 bg-white relative">
       <div className="container mx-auto px-4">
@@ -178,59 +212,28 @@ const Information: React.FC = () => {
           </div>
         </div>
 
-        <div className="max-w-3xl mx-auto text-center">
-          <h3 className="text-2xl font-bold text-yellow-900 mb-8">Nos Partenaires</h3>
-          <div className="flex justify-center items-center space-x-8">
-            <a 
-              href="https://picardieverte.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="transition-transform duration-300 hover:scale-105"
-            >
-              <img 
-                src="https://picardieverte.com/wp-content/uploads/2024/09/Logo_CCPV_Green.png" 
-                alt="Communauté de Communes de la Picardie Verte" 
-                className="h-24 w-auto"
-              />
-            </a>
-            <a 
-              href="https://www.facebook.com/asca.beauvais" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="transition-transform duration-300 hover:scale-105"
-            >
-              <img 
-                src="https://scontent.fcdg3-1.fna.fbcdn.net/v/t39.30808-1/480466632_625719733490144_7728950089363766399_n.jpg?stp=dst-jpg_s200x200_tt6&_nc_cat=100&ccb=1-7&_nc_sid=2d3e12&_nc_ohc=O2c5D_bN34EQ7kNvwF8HHoP&_nc_oc=AdnGJXahZtMaABR1LCpaqm5KnLZkMS5x5d-k70nrwczVx15H6ddMU719nsFYaVKwKb5K1fUuNnsNprHZ3vOdvNk5&_nc_zt=24&_nc_ht=scontent.fcdg3-1.fna&_nc_gid=lfJ4P88MyfFQLOJrla7bGg&oh=00_AfKZe_EIAl2qlRDuTU7NMZ6tbGmWDBAQ3ZkINevBudEW1w&oe=682A655B" 
-                alt="ASCA Beauvais" 
-                className="h-24 w-auto rounded-full"
-              />
-            </a>
-            <a 
-              href="https://www.facebook.com/asca.beauvais" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="transition-transform duration-300 hover:scale-105"
-            >
-              <img 
-                src="https://scontent.fcdg3-1.fna.fbcdn.net/v/t39.30808-6/482269515_658873380006287_7970189413545758165_n.jpg?_nc_cat=104&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=ZHwnpk-3YyUQ7kNvwEHvRUi&_nc_oc=AdmpRn-H1o9We8HXw2o9Zj0770d66Vkve7kRwpyZhecA-WgjesgK-mAefQ5CHFH1G2iwzkp6c6BnFfOEy7xMsWqu&_nc_zt=23&_nc_ht=scontent.fcdg3-1.fna&_nc_gid=sMwExsWM97j_7zOx8He3GA&oh=00_AfLiMpyAhwmIawkSQBeNzvrdNSmd_paZVcnpGOI2BXwvTQ&oe=682A5B96" 
-                alt="ASCA" 
-                className="h-24 w-auto"
-              />
-            </a>
-            <a 
-              href="#" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="transition-transform duration-300 hover:scale-105"
-            >
-              <img 
-                src="https://scontent.fcdg3-1.fna.fbcdn.net/v/t39.30808-6/305698382_484806533652173_8627251451207591047_n.jpg?_nc_cat=100&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=DAq1quBtwg0Q7kNvwGgeb5c&_nc_oc=AdnkvmZibayYHGlgOvVbauRhnDB0U4IpSBe79Uv1d_j9wFFkG_Tq3Q1W87_BL3aHUzWd2OlTJ9j-UL9MnjRAImyu&_nc_zt=23&_nc_ht=scontent.fcdg3-1.fna&_nc_gid=bzipOi0_LfHXtKqs-w2FaQ&oh=00_AfKnf9tQU37QNW1sewl-KAhC74mwe_jFIHSdMtaYS44CIQ&oe=682A576C" 
-                alt="Nouveau partenaire" 
-                className="h-24 w-auto"
-              />
-            </a>
+        {!loading && partners.length > 0 && (
+          <div className="max-w-3xl mx-auto text-center">
+            <h3 className="text-2xl font-bold text-yellow-900 mb-8">Nos Partenaires</h3>
+            <div className="flex flex-wrap justify-center items-center gap-8">
+              {partners.map((partner) => (
+                <a 
+                  key={partner.id}
+                  href={partner.website_url || '#'} 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="transition-transform duration-300 hover:scale-105"
+                >
+                  <img 
+                    src={partner.logo_url} 
+                    alt={partner.name} 
+                    className="h-24 w-auto"
+                  />
+                </a>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
         
         <div itemScope itemType="https://schema.org/LocalBusiness" className="hidden">
           <meta itemProp="name" content="Fête du Bout du Haut" />

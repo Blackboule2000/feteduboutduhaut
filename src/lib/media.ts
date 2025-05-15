@@ -1,3 +1,5 @@
+import { supabase } from './supabase';
+
 export async function uploadMedia(file: File, path: string): Promise<string> {
   // Vérifications préliminaires
   if (!file) {

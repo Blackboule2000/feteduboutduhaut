@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Settings, BarChart, Newspaper, Activity, Info, Users, Layout, Image } from 'lucide-react';
+import { LogOut, Settings, BarChart, Newspaper, Activity, Info, Users, Layout } from 'lucide-react';
 import NewsForm from './NewsForm';
 import ActivityForm from './ActivityForm';
 import VisitorsMap from './VisitorsMap';
@@ -10,7 +10,6 @@ import HeaderForm from './HeaderForm';
 import ProgramForm from './ProgramForm';
 import InformationForm from './InformationForm';
 import PartnersForm from './PartnersForm';
-import PosterForm from './PosterForm';
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -61,7 +60,6 @@ function Dashboard() {
             {[
               { id: 'overview', name: 'Vue d\'ensemble', icon: BarChart },
               { id: 'header', name: 'Bandeau', icon: Layout },
-              { id: 'poster', name: 'Affiche', icon: Image },
               { id: 'program', name: 'Programme', icon: Activity },
               { id: 'news', name: 'Actualités', icon: Newspaper },
               { id: 'activities', name: 'Activités', icon: Activity },
@@ -101,15 +99,6 @@ function Dashboard() {
                 <h2 className="text-xl font-bold text-yellow-900">Gestion du bandeau</h2>
               </div>
               <HeaderForm />
-            </div>
-          )}
-
-          {activeTab === 'poster' && (
-            <div>
-              <div className="flex justify-between items-center mb-6">
-                <h2 className="text-xl font-bold text-yellow-900">Gestion de l'affiche</h2>
-              </div>
-              <PosterForm />
             </div>
           )}
 

@@ -49,7 +49,8 @@ const News: React.FC = () => {
   };
 
   useEffect(() => {
-    const timer = setInterval(nextSlide, 5000);
+    // Augmentation de l'intervalle à 8000ms (8 secondes)
+    const timer = setInterval(nextSlide, 8000);
     return () => clearInterval(timer);
   }, [newsData.length]);
 
@@ -99,7 +100,7 @@ const News: React.FC = () => {
               return (
                 <div
                   key={news.id}
-                  className={`absolute inset-0 transition-all duration-700 transform ${
+                  className={`absolute inset-0 transition-all duration-1000 transform ${
                     index === currentIndex 
                       ? 'opacity-100 rotate-0 scale-100' 
                       : index < currentIndex
@@ -112,7 +113,6 @@ const News: React.FC = () => {
                   } as React.CSSProperties}
                 >
                   <div className="polaroid-card h-full transform hover:rotate-1 transition-transform duration-500 bg-[#f6d9a0]">
-                    {/* Masking Tape Elements */}
                     <div className="tape tape-top"></div>
                     <div className="tape tape-left"></div>
                     <div className="tape tape-right"></div>

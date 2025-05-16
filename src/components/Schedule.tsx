@@ -40,35 +40,13 @@ const Schedule: React.FC = () => {
     }
   };
 
-  // Séparation des concerts par catégorie
-  const motolo = program.find(concert => concert.title === "MOTOLO");
-  const arbas = program.find(concert => concert.title === "Arbas");
-  const afterParty = program.find(concert => concert.title === "Anna Rudy & Paul Lazarus");
-  
-  // Autres concerts triés par horaire
-  const dayConcerts = program
-    .filter(concert => 
-      concert.title !== "MOTOLO" && 
-      concert.title !== "Arbas" && 
-      concert.title !== "Anna Rudy & Paul Lazarus"
-    )
-    .sort((a, b) => {
-      const timeA = parseInt(a.time.split(':')[0]);
-      const timeB = parseInt(b.time.split(':')[0]);
-      return timeA - timeB;
-    });
-
   const AudioPlayer = ({ url }: { url: string | null }) => {
     if (!url) return null;
     return (
       <div className="mt-4">
         <audio
           controls
-          className="w-full h-12 rounded-lg"
-          style={{
-            backgroundColor: '#f6d9a0',
-            boxShadow: 'inset 0 2px 4px rgba(0,0,0,0.1)'
-          }}
+          className="w-full"
         >
           <source src={url} type="audio/mpeg" />
           Votre navigateur ne supporte pas la lecture audio.
@@ -79,12 +57,24 @@ const Schedule: React.FC = () => {
 
   const VideoPlayer = ({ url }: { url: string | undefined }) => {
     if (!url) return null;
+
+    // Extraction de l'ID de la vidéo YouTube si nécessaire
+    const getYouTubeEmbedUrl = (url: string) => {
+      if (url.includes('youtube.com/embed/')) {
+        return url;
+      }
+      const videoId = url.split('v=')[1]?.split('&')[0];
+      return `https://www.youtube.com/embed/${videoId}`;
+    };
+
+    const embedUrl = url.includes('youtube.com') ? getYouTubeEmbedUrl(url) : url;
+
     return (
       <div className="mt-4 aspect-video rounded-lg overflow-hidden shadow-lg">
         <iframe
           width="100%"
           height="100%"
-          src={url}
+          src={embedUrl}
           title="Lecteur vidéo"
           frameBorder="0"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
@@ -132,8 +122,8 @@ const Schedule: React.FC = () => {
           <p className="text-2xl text-[#ca5231]/80 font-['Rainy Days'] mb-6 leading-relaxed">
             {concert.description}
           </p>
-          <AudioPlayer url={concert.audio_url} />
-          <VideoPlayer url={concert.video_url} />
+          {concert.audio_url && <AudioPlayer url={concert.audio_url} />}
+          {concert.video_url && <VideoPlayer url={concert.video_url} />}
         </div>
       </div>
     </div>
@@ -182,8 +172,8 @@ const Schedule: React.FC = () => {
               {concert.description}
             </p>
             
-            <AudioPlayer url={concert.audio_url} />
-            <VideoPlayer url={concert.video_url} />
+            {concert.audio_url && <AudioPlayer url={concert.audio_url} />}
+            {concert.video_url && <VideoPlayer url={concert.video_url} />}
           </div>
         </div>
       </div>
@@ -199,6 +189,23 @@ const Schedule: React.FC = () => {
       </section>
     );
   }
+
+  // Tri des concerts par horaire
+  const sortedProgram = [...program].sort((a, b) => {
+    const timeA = parseInt(a.time.split(':')[0]);
+    const timeB = parseInt(b.time.split(':')[0]);
+    return timeA - timeB;
+  });
+
+  // Séparation des concerts
+  const motolo = sortedProgram.find(concert => concert.title === "MOTOLO");
+  const arbas = sortedProgram.find(concert => concert.title === "Arbas");
+  const afterParty = sortedProgram.find(concert => concert.title === "Anna Rudy & Paul Lazarus");
+  const dayConcerts = sortedProgram.filter(concert => 
+    concert.title !== "MOTOLO" && 
+    concert.title !== "Arbas" && 
+    concert.title !== "Anna Rudy & Paul Lazarus"
+  );
 
   return (
     <section id="programme" className="relative py-20 bg-festival-turquoise overflow-hidden">
@@ -219,28 +226,24 @@ const Schedule: React.FC = () => {
           </p>
         </div>
 
-        {/* MOTOLO - Tête d'affiche principale */}
         {motolo && (
           <div className="mb-16">
             <MainArtistCard concert={motolo} />
           </div>
         )}
 
-        {/* ARBAS - Deuxième tête d'affiche */}
         {arbas && (
           <div className="max-w-4xl mx-auto mb-16">
             <MainArtistCard concert={arbas} />
           </div>
         )}
 
-        {/* Concerts de la journée */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
           {dayConcerts.map((concert) => (
             <ConcertCard key={concert.id} concert={concert} />
           ))}
         </div>
 
-        {/* After Party */}
         {afterParty && (
           <div className="max-w-3xl mx-auto mt-20">
             <div className="text-center mb-8">
@@ -258,48 +261,32 @@ const Schedule: React.FC = () => {
           </div>
         )}
 
-        {/* Timeline des concerts */}
         <div className="mt-20 bg-[#f6d9a0]/90 backdrop-blur-sm rounded-xl p-8 max-w-3xl mx-auto">
           <h3 className="text-center font-['Swiss 721 Black Extended BT'] text-3xl mb-8 text-[#ca5231]">
             HORAIRES DES CONCERTS
           </h3>
           <div className="space-y-4">
-            {program
-              .sort((a, b) => {
-                // Convertir les heures en nombres pour la comparaison
-                const getTimeValue = (time: string) => {
-                  const hour = parseInt(time.split(':')[0]);
-                  // Si l'heure est 00:00, la considérer comme 24:00
-                  return hour === 0 ? 24 : hour;
-                };
-                
-                const timeA = getTimeValue(a.time);
-                const timeB = getTimeValue(b.time);
-                return timeA - timeB;
-              })
-              .map((concert) => (
-                <div 
-                  key={concert.id}
-                  className="flex items-center justify-between p-4 hover:bg-white/30 rounded-lg transition-colors duration-300"
-                >
-                  <div className="flex items-center space-x-4">
-                    <Clock className="w-5 h-5 text-[#ca5231]" />
-                    <span className="text-xl font-['Railroad Gothic'] text-[#ca5231]">
-                      {concert.time}
-                    </span>
-                    <span className="text-2xl font-['Swiss 721 Black Extended BT'] text-[#ca5231]">
-                      {concert.title}
-                    </span>
-                  </div>
-                  <span className="text-lg text-[#ca5231]/80 font-['Rainy Days']">
-                    {concert.stage}
+            {sortedProgram.map((concert) => (
+              <div 
+                key={concert.id}
+                className="flex items-center justify-between p-4 hover:bg-white/30 rounded-lg transition-colors duration-300"
+              >
+                <div className="flex items-center space-x-4">
+                  <Clock className="w-5 h-5 text-[#ca5231]" />
+                  <span className="text-xl font-['Railroad Gothic'] text-[#ca5231]">
+                    {concert.time}
+                  </span>
+                  <span className="text-2xl font-['Swiss 721 Black Extended BT'] text-[#ca5231]">
+                    {concert.title}
                   </span>
                 </div>
-              ))
-            }
+                <span className="text-lg text-[#ca5231]/80 font-['Rainy Days']">
+                  {concert.stage}
+                </span>
+              </div>
+            ))}
           </div>
         </div>
-
       </div>
     </section>
   );

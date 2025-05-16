@@ -44,10 +44,7 @@ const Schedule: React.FC = () => {
     if (!url) return null;
     return (
       <div className="mt-4">
-        <audio
-          controls
-          className="w-full"
-        >
+        <audio controls className="w-full">
           <source src={url} type="audio/mpeg" />
           Votre navigateur ne supporte pas la lecture audio.
         </audio>
@@ -58,25 +55,20 @@ const Schedule: React.FC = () => {
   const VideoPlayer = ({ url }: { url: string | undefined }) => {
     if (!url) return null;
 
-    // Extraction de l'ID de la vidéo YouTube si nécessaire
-    const getYouTubeEmbedUrl = (url: string) => {
-      if (url.includes('youtube.com/embed/')) {
-        return url;
-      }
+    // Convert YouTube watch URLs to embed URLs if needed
+    let embedUrl = url;
+    if (url.includes('youtube.com/watch?v=')) {
       const videoId = url.split('v=')[1]?.split('&')[0];
-      return `https://www.youtube.com/embed/${videoId}`;
-    };
-
-    const embedUrl = url.includes('youtube.com') ? getYouTubeEmbedUrl(url) : url;
+      if (videoId) {
+        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+      }
+    }
 
     return (
       <div className="mt-4 aspect-video rounded-lg overflow-hidden shadow-lg">
         <iframe
-          width="100%"
-          height="100%"
           src={embedUrl}
-          title="Lecteur vidéo"
-          frameBorder="0"
+          title="Video player"
           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
           allowFullScreen
           className="w-full h-full"

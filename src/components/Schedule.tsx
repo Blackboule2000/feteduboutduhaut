@@ -43,11 +43,16 @@ const Schedule: React.FC = () => {
   const AudioPlayer = ({ url }: { url: string | null }) => {
     if (!url) return null;
     return (
-      <div className="mt-4">
-        <audio controls className="w-full">
-          <source src={url} type="audio/mpeg" />
-          Votre navigateur ne supporte pas la lecture audio.
-        </audio>
+      <div className="relative z-50 mt-4">
+        <div className="relative bg-white/5 backdrop-blur-sm rounded-lg overflow-hidden pointer-events-auto">
+          <audio 
+            controls 
+            className="w-full focus:outline-none"
+          >
+            <source src={url} type="audio/mpeg" />
+            Votre navigateur ne supporte pas la lecture audio.
+          </audio>
+        </div>
       </div>
     );
   };
@@ -60,19 +65,22 @@ const Schedule: React.FC = () => {
     if (url.includes('youtube.com/watch?v=')) {
       const videoId = url.split('v=')[1]?.split('&')[0];
       if (videoId) {
-        embedUrl = `https://www.youtube.com/embed/${videoId}`;
+        embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
       }
     }
 
     return (
-      <div className="mt-4 aspect-video rounded-lg overflow-hidden shadow-lg">
-        <iframe
-          src={embedUrl}
-          title="Video player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          className="w-full h-full"
-        />
+      <div className="relative z-50 mt-4 aspect-video rounded-lg overflow-hidden shadow-lg">
+        <div className="absolute inset-0 bg-black/5 backdrop-blur-sm"></div>
+        <div className="relative w-full h-full pointer-events-auto">
+          <iframe
+            src={embedUrl}
+            title="Video player"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            className="w-full h-full rounded-lg"
+          />
+        </div>
       </div>
     );
   };

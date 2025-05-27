@@ -214,54 +214,54 @@ const VisitorsMap: React.FC = () => {
   return (
     <div className="space-y-8">
       {/* Statistics Overview */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-102 cursor-pointer">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-102">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-[#ca5231]">Total Visits</h3>
             <div className="p-3 bg-[#ca5231]/10 rounded-full">
               <Users className="h-6 w-6 text-[#ca5231]" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-[#ca5231] mb-2">{totalVisits}</p>
+          <p className="text-4xl font-bold text-[#ca5231] mb-2">{totalVisits}</p>
           <div className="flex items-center text-[#ca5231]/60">
             <Calendar className="h-4 w-4 mr-2" />
             <p className="text-sm">Since the beginning</p>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-102 cursor-pointer">
+        <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-102">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-[#ca5231]">Messages</h3>
             <div className="p-3 bg-[#ca5231]/10 rounded-full">
               <MessageSquare className="h-6 w-6 text-[#ca5231]" />
             </div>
           </div>
-          <div className="flex items-center space-x-4">
+          <div className="flex items-center space-x-8">
             <div>
               <div className="flex items-center text-[#ca5231] mb-1">
                 <XCircle className="h-4 w-4 mr-2" />
-                <p className="text-3xl font-bold">{unreadMessages.length}</p>
+                <p className="text-4xl font-bold">{unreadMessages.length}</p>
               </div>
               <p className="text-sm text-[#ca5231]/60">Unread</p>
             </div>
             <div>
               <div className="flex items-center text-green-500 mb-1">
                 <CheckCircle className="h-4 w-4 mr-2" />
-                <p className="text-3xl font-bold">{readMessages.length}</p>
+                <p className="text-4xl font-bold">{readMessages.length}</p>
               </div>
               <p className="text-sm text-[#ca5231]/60">Read</p>
             </div>
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-102 cursor-pointer">
+        <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-102">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-[#ca5231]">Countries</h3>
             <div className="p-3 bg-[#ca5231]/10 rounded-full">
               <Globe className="h-6 w-6 text-[#ca5231]" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-[#ca5231] mb-2">
+          <p className="text-4xl font-bold text-[#ca5231] mb-2">
             {new Set(locations.map(loc => loc.country)).size}
           </p>
           <div className="flex items-center text-[#ca5231]/60">
@@ -270,14 +270,14 @@ const VisitorsMap: React.FC = () => {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 transform hover:scale-102 cursor-pointer">
+        <div className="bg-white p-6 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-102">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-lg font-semibold text-[#ca5231]">Avg. Duration</h3>
             <div className="p-3 bg-[#ca5231]/10 rounded-full">
               <Clock className="h-6 w-6 text-[#ca5231]" />
             </div>
           </div>
-          <p className="text-3xl font-bold text-[#ca5231] mb-2">
+          <p className="text-4xl font-bold text-[#ca5231] mb-2">
             {formatDuration(averageSessionDuration)}
           </p>
           <div className="flex items-center text-[#ca5231]/60">
@@ -288,7 +288,7 @@ const VisitorsMap: React.FC = () => {
       </div>
 
       {/* Peak Hours */}
-      <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+      <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-[#ca5231] flex items-center">
             <Clock className="h-5 w-5 mr-2" />
@@ -298,11 +298,11 @@ const VisitorsMap: React.FC = () => {
             <Activity className="h-4 w-4 text-[#ca5231]" />
           </div>
         </div>
-        <div className="grid grid-cols-5 gap-4">
+        <div className="grid grid-cols-5 gap-6">
           {peakHours.map(({ hour, count }) => (
-            <div key={hour} className="bg-[#ca5231]/5 p-4 rounded-lg text-center hover:bg-[#ca5231]/10 transition-colors duration-300">
-              <div className="text-2xl font-bold text-[#ca5231]">{hour}h</div>
-              <div className="text-sm text-[#ca5231]/60">{count} visits</div>
+            <div key={hour} className="bg-[#ca5231]/5 p-6 rounded-xl text-center hover:bg-[#ca5231]/10 transition-all duration-300 transform hover:scale-105">
+              <div className="text-3xl font-bold text-[#ca5231]">{hour}h</div>
+              <div className="text-sm text-[#ca5231]/60 mt-2">{count} visits</div>
             </div>
           ))}
         </div>
@@ -310,13 +310,13 @@ const VisitorsMap: React.FC = () => {
 
       {/* Unread Messages */}
       {unreadMessages.length > 0 && (
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+        <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-[#ca5231] flex items-center">
               <MessageSquare className="h-5 w-5 mr-2" />
               Unread Messages
             </h3>
-            <span className="bg-[#ca5231] text-white px-3 py-1 rounded-full text-sm">
+            <span className="bg-[#ca5231] text-white px-4 py-2 rounded-full text-sm font-semibold">
               {unreadMessages.length} new
             </span>
           </div>
@@ -324,11 +324,11 @@ const VisitorsMap: React.FC = () => {
             {unreadMessages.map((message) => (
               <div 
                 key={message.id} 
-                className="border-l-4 border-[#ca5231] pl-4 py-4 bg-[#ca5231]/5 rounded-r-lg hover:bg-[#ca5231]/10 transition-colors duration-300"
+                className="border-l-4 border-[#ca5231] pl-6 py-6 bg-[#ca5231]/5 rounded-xl hover:bg-[#ca5231]/10 transition-all duration-300"
               >
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-semibold text-[#ca5231] text-lg">{message.name}</h4>
+                    <h4 className="font-semibold text-[#ca5231] text-xl mb-1">{message.name}</h4>
                     <p className="text-sm text-[#ca5231]/60">{message.email}</p>
                   </div>
                   <div className="flex items-center space-x-4">
@@ -337,13 +337,13 @@ const VisitorsMap: React.FC = () => {
                     </span>
                     <button
                       onClick={() => markMessageAsRead(message.id)}
-                      className="p-2 bg-green-500/10 rounded-full hover:bg-green-500/20 transition-colors duration-300"
+                      className="p-2 bg-green-500/10 rounded-full hover:bg-green-500/20 transition-all duration-300 transform hover:scale-110"
                     >
                       <CheckCircle className="h-5 w-5 text-green-500" />
                     </button>
                   </div>
                 </div>
-                <p className="mt-2 text-[#ca5231]/80 line-clamp-2">{message.message}</p>
+                <p className="mt-4 text-[#ca5231]/80 line-clamp-2">{message.message}</p>
               </div>
             ))}
           </div>
@@ -351,18 +351,18 @@ const VisitorsMap: React.FC = () => {
       )}
 
       {/* Visitors Map */}
-      <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+      <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
         <div className="flex items-center justify-between mb-6">
           <h3 className="text-lg font-semibold text-[#ca5231] flex items-center">
             <Globe className="h-5 w-5 mr-2" />
             Visitors Map
           </h3>
-          <div className="flex items-center space-x-2 text-[#ca5231]/60">
-            <span className="text-sm">{locations.length} locations</span>
+          <div className="flex items-center space-x-3 text-[#ca5231]/60">
+            <span className="text-sm font-medium">{locations.length} locations</span>
             <div className="w-2 h-2 rounded-full bg-[#ca5231] animate-pulse"></div>
           </div>
         </div>
-        <div className="h-[400px] relative rounded-lg overflow-hidden">
+        <div className="h-[500px] relative rounded-xl overflow-hidden">
           <MapContainer
             center={[46.603354, 1.888334]}
             zoom={6}
@@ -400,21 +400,21 @@ const VisitorsMap: React.FC = () => {
       </div>
 
       {/* Charts */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         {/* Page Statistics */}
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+        <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-[#ca5231] flex items-center">
               <Activity className="h-5 w-5 mr-2" />
               Visits by Page
             </h3>
           </div>
-          <div className="h-[300px]">
+          <div className="h-[400px]">
             <BarChart
               width={500}
-              height={300}
+              height={400}
               data={pageViews}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#ca523120" />
               <XAxis dataKey="page" stroke="#ca5231" />
@@ -423,32 +423,38 @@ const VisitorsMap: React.FC = () => {
                 contentStyle={{
                   backgroundColor: 'white',
                   border: '1px solid #ca523120',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 8px rgba(202, 82, 49, 0.1)'
                 }}
               />
               <Legend />
-              <Bar dataKey="views" fill="#ca5231" radius={[4, 4, 0, 0]} />
+              <Bar 
+                dataKey="views" 
+                fill="#ca5231" 
+                radius={[4, 4, 0, 0]}
+                className="hover:opacity-80 transition-opacity duration-300"
+              />
             </BarChart>
           </div>
         </div>
 
         {/* Mobile/Desktop Distribution */}
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+        <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-[#ca5231] flex items-center">
               <Devices className="h-5 w-5 mr-2" />
               Device Distribution
             </h3>
           </div>
-          <div className="h-[300px] flex items-center justify-center">
-            <PieChart width={400} height={300}>
+          <div className="h-[400px] flex items-center justify-center">
+            <PieChart width={400} height={400}>
               <Pie
                 data={deviceStats}
                 cx={200}
-                cy={150}
+                cy={200}
                 labelLine={false}
                 label={({ name, percent }) => `${name} (${(percent * 100).toFixed(0)}%)`}
-                outerRadius={80}
+                outerRadius={160}
                 fill="#8884d8"
                 dataKey="count"
               >
@@ -464,7 +470,8 @@ const VisitorsMap: React.FC = () => {
                 contentStyle={{
                   backgroundColor: 'white',
                   border: '1px solid #ca523120',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 8px rgba(202, 82, 49, 0.1)'
                 }}
               />
             </PieChart>
@@ -472,19 +479,19 @@ const VisitorsMap: React.FC = () => {
         </div>
 
         {/* Visits Evolution */}
-        <div className="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 md:col-span-2">
+        <div className="bg-white p-8 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 col-span-1 lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
             <h3 className="text-lg font-semibold text-[#ca5231] flex items-center">
               <Calendar className="h-5 w-5 mr-2" />
               Visits Evolution
             </h3>
           </div>
-          <div className="h-[300px]">
+          <div className="h-[400px]">
             <LineChart
               width={1000}
-              height={300}
+              height={400}
               data={dailyStats}
-              margin={{ top: 5, right: 30, left: 20, bottom: 5 }}
+              margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
             >
               <CartesianGrid strokeDasharray="3 3" stroke="#ca523120" />
               <XAxis dataKey="date" stroke="#ca5231" />
@@ -493,7 +500,8 @@ const VisitorsMap: React.FC = () => {
                 contentStyle={{
                   backgroundColor: 'white',
                   border: '1px solid #ca523120',
-                  borderRadius: '8px'
+                  borderRadius: '8px',
+                  boxShadow: '0 2px 8px rgba(202, 82, 49, 0.1)'
                 }}
               />
               <Legend />

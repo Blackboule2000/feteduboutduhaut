@@ -1,65 +1,57 @@
 import { supabase } from './supabase';
+import { v4 as uuidv4 } from 'uuid';
 
-let geoLocationFailures = 0;
-const MAX_FAILURES = 3;
+// Constants
+const SESSION_DURATION = 30 * 60 * 1000; // 30 minutes
+const BOT_PATTERNS = [
+  /bot/i, /crawler/i, /spider/i, /googlebot/i, /bingbot/i, /yahoo/i,
+  /baidu/i, /yandex/i, /duckduckbot/i
+];
 
-const getLocationData = async (ip: string) => {
-  if (geoLocationFailures >= MAX_FAILURES) {
-    return null;
+// Helper to check if user agent is a bot
+const isBot = (userAgent: string): boolean => {
+  return BOT_PATTERNS.some(pattern => pattern.test(userAgent));
+};
+
+// Get or create session ID
+const getSessionId = (): string => {
+  let sessionId = sessionStorage.getItem('session_id');
+  const lastActivity = sessionStorage.getItem('last_activity');
+  const now = Date.now();
+
+  // Check if session expired
+  if (lastActivity && now - parseInt(lastActivity) > SESSION_DURATION) {
+    sessionId = null;
   }
 
-  const APIs = [
-    {
-      url: `https://ipapi.co/${ip}/json/`,
-      transform: (data: any) => ({
-        country: data.country_name,
-        region: data.region,
-        city: data.city,
-        latitude: data.latitude,
-        longitude: data.longitude
-      })
-    },
-    {
-      url: `https://ip-api.com/json/${ip}?fields=status,message,country,regionName,city,lat,lon`,
-      transform: (data: any) => ({
-        country: data.country,
-        region: data.regionName,
-        city: data.city,
-        latitude: data.lat,
-        longitude: data.lon
-      })
-    }
-  ];
-
-  for (const api of APIs) {
-    try {
-      const response = await fetch(api.url, {
-        signal: AbortSignal.timeout(5000)
-      });
-      
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      
-      const data = await response.json();
-      
-      if (data.status === 'success' || (data.country && data.city)) {
-        geoLocationFailures = 0;
-        return api.transform(data);
-      }
-    } catch (error) {
-      console.warn(`API de géolocalisation échouée: ${api.url}`, error);
-      continue;
-    }
+  if (!sessionId) {
+    sessionId = uuidv4();
+    sessionStorage.setItem('session_id', sessionId);
   }
 
-  geoLocationFailures++;
-  console.warn(`Tentative de géolocalisation ${geoLocationFailures} sur ${MAX_FAILURES} échouée`);
-  return null;
+  sessionStorage.setItem('last_activity', now.toString());
+  return sessionId;
+};
+
+// Get or create visitor ID
+const getVisitorId = (): string => {
+  let visitorId = localStorage.getItem('visitor_id');
+  if (!visitorId) {
+    visitorId = uuidv4();
+    localStorage.setItem('visitor_id', visitorId);
+  }
+  return visitorId;
 };
 
 export const trackPageView = async (page: string) => {
   try {
+    // Don't track bots
+    if (isBot(navigator.userAgent)) {
+      return null;
+    }
+
+    const sessionId = getSessionId();
+    const visitorId = getVisitorId();
     const sessionStart = sessionStorage.getItem('session_start');
     const sessionDuration = sessionStart ? Math.floor((Date.now() - parseInt(sessionStart)) / 1000) : 0;
 
@@ -67,6 +59,7 @@ export const trackPageView = async (page: string) => {
       sessionStorage.setItem('session_start', Date.now().toString());
     }
 
+    // Get location data
     let locationData = null;
     try {
       const ipResponse = await fetch('https://api.ipify.org?format=json', {
@@ -74,20 +67,49 @@ export const trackPageView = async (page: string) => {
       });
       
       if (!ipResponse.ok) {
-        throw new Error(`Erreur HTTP! status: ${ipResponse.status}`);
+        throw new Error(`HTTP error! status: ${ipResponse.status}`);
       }
       
       const { ip } = await ipResponse.json();
-      locationData = await getLocationData(ip);
+      
+      // Try multiple geolocation services
+      const geoResponse = await Promise.any([
+        fetch(`https://ipapi.co/${ip}/json/`),
+        fetch(`https://ip-api.com/json/${ip}?fields=status,message,country,regionName,city,lat,lon`)
+      ]);
+
+      if (geoResponse.ok) {
+        const data = await geoResponse.json();
+        locationData = {
+          country: data.country || data.country_name,
+          region: data.regionName || data.region,
+          city: data.city,
+          latitude: data.lat || data.latitude,
+          longitude: data.lon || data.longitude
+        };
+      }
     } catch (error) {
-      console.warn('Erreur lors de la récupération de l\'IP ou des données de localisation:', error);
+      console.warn('Error getting location data:', error);
     }
 
+    // Update session
+    await supabase
+      .from('sessions')
+      .upsert({
+        session_id: sessionId,
+        first_seen: new Date().toISOString()
+      }, {
+        onConflict: 'session_id'
+      });
+
+    // Track page view
     const { data, error } = await supabase
       .from('stats')
       .insert([{
         page_view: page,
         view_count: 1,
+        session_id: sessionId,
+        visitor_id: visitorId,
         user_agent: navigator.userAgent,
         referrer: document.referrer,
         session_duration: sessionDuration,
@@ -103,7 +125,7 @@ export const trackPageView = async (page: string) => {
     if (error) throw error;
     return data;
   } catch (error) {
-    console.error('Erreur lors du suivi de la page:', error);
+    console.error('Error tracking page view:', error);
     return null;
   }
 };

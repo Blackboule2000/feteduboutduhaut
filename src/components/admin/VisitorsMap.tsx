@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import 'leaflet/dist/leaflet.css';
 import { supabase } from '../../lib/supabase';
-import { MessageSquare, Users, Globe, Clock, CheckCircle, XCircle, Calendar, Activity } from 'lucide-react';
+import { MessageSquare, Users, Globe, Clock, CheckCircle, XCircle, Calendar, Activity, Devices } from 'lucide-react';
 
 interface VisitorLocation {
   city: string;

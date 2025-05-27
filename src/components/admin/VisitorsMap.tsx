@@ -48,13 +48,13 @@ const VisitorsMap: React.FC = () => {
 
   useEffect(() => {
     loadStatistics();
-    const interval = setInterval(loadStatistics, 60000); // Actualisation toutes les minutes
+    const interval = setInterval(loadStatistics, 60000); // Refresh every minute
     return () => clearInterval(interval);
   }, []);
 
   const loadStatistics = async () => {
     try {
-      // Charger les messages
+      // Load all messages and separate read/unread
       const { data: messages } = await supabase
         .from('contact_messages')
         .select('*')
@@ -65,7 +65,7 @@ const VisitorsMap: React.FC = () => {
         setReadMessages(messages.filter(msg => msg.read));
       }
 
-      // Charger les données de localisation
+      // Load location data with timestamps
       const { data: locationData } = await supabase
         .from('stats')
         .select('city, region, country, latitude, longitude, view_count, session_duration, created_at')
@@ -73,12 +73,12 @@ const VisitorsMap: React.FC = () => {
         .not('longitude', 'is', null);
 
       if (locationData) {
-        // Calculer la durée moyenne des sessions
+        // Calculate average session duration
         const totalDuration = locationData.reduce((sum, curr) => sum + (curr.session_duration || 0), 0);
         const avgDuration = totalDuration / locationData.length || 0;
         setAverageSessionDuration(Math.round(avgDuration));
 
-        // Calculer les heures de pointe
+        // Calculate peak hours
         const hourCounts = locationData.reduce((acc: Record<number, number>, curr) => {
           const hour = new Date(curr.created_at).getHours();
           acc[hour] = (acc[hour] || 0) + (curr.view_count || 1);
@@ -92,14 +92,14 @@ const VisitorsMap: React.FC = () => {
             .slice(0, 5)
         );
 
-        // Agréger les données de localisation
+        // Aggregate location data
         const locationMap = locationData.reduce((acc: Record<string, VisitorLocation>, curr) => {
           const key = `${curr.latitude}-${curr.longitude}`;
           if (!acc[key]) {
             acc[key] = {
-              city: curr.city || 'Inconnue',
-              region: curr.region || 'Inconnue',
-              country: curr.country || 'Inconnue',
+              city: curr.city || 'Unknown',
+              region: curr.region || 'Unknown',
+              country: curr.country || 'Unknown',
               count: 0,
               coordinates: [curr.latitude, curr.longitude]
             };
@@ -113,7 +113,7 @@ const VisitorsMap: React.FC = () => {
         setTotalVisits(locations.reduce((sum, loc) => sum + loc.count, 0));
       }
 
-      // Charger les statistiques par page
+      // Load page statistics
       const { data: pageData } = await supabase
         .from('stats')
         .select('page_view, view_count')
@@ -121,7 +121,7 @@ const VisitorsMap: React.FC = () => {
 
       if (pageData) {
         const pageStats = pageData.reduce((acc: Record<string, number>, curr) => {
-          const page = curr.page_view.replace('/', '') || 'Accueil';
+          const page = curr.page_view.replace('/', '') || 'Home';
           acc[page] = (acc[page] || 0) + (curr.view_count || 1);
           return acc;
         }, {});
@@ -132,7 +132,7 @@ const VisitorsMap: React.FC = () => {
         })));
       }
 
-      // Charger les statistiques par appareil
+      // Load device statistics
       const { data: deviceData } = await supabase
         .from('stats')
         .select('user_agent, view_count')
@@ -151,7 +151,7 @@ const VisitorsMap: React.FC = () => {
         })));
       }
 
-      // Charger les statistiques quotidiennes
+      // Load daily statistics
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -177,7 +177,7 @@ const VisitorsMap: React.FC = () => {
         })));
       }
     } catch (error) {
-      console.error('Erreur lors du chargement des statistiques:', error);
+      console.error('Error loading statistics:', error);
     } finally {
       setLoading(false);
     }
@@ -197,31 +197,31 @@ const VisitorsMap: React.FC = () => {
         .eq('id', messageId);
 
       if (error) throw error;
-      await loadStatistics(); // Recharger les messages
+      await loadStatistics();
     } catch (err) {
-      console.error('Erreur lors du marquage du message:', err);
+      console.error('Error marking message as read:', err);
     }
   };
 
   if (loading) {
     return (
       <div className="h-[600px] w-full rounded-lg overflow-hidden shadow-lg bg-gray-50 flex items-center justify-center">
-        <div className="text-[#ca5231]">Chargement des statistiques...</div>
+        <div className="text-[#ca5231]">Loading statistics...</div>
       </div>
     );
   }
 
   return (
     <div className="space-y-8">
-      {/* Statistiques générales */}
+      {/* Statistics Overview */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-[#ca5231]">Visites totales</h3>
+            <h3 className="text-lg font-semibold text-[#ca5231]">Total Visits</h3>
             <Users className="h-6 w-6 text-[#ca5231]" />
           </div>
           <p className="text-3xl font-bold text-[#ca5231] mt-2">{totalVisits}</p>
-          <p className="text-sm text-[#ca5231]/60 mt-1">Depuis le début</p>
+          <p className="text-sm text-[#ca5231]/60 mt-1">Since the beginning</p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md">
@@ -232,60 +232,60 @@ const VisitorsMap: React.FC = () => {
           <div className="flex items-center space-x-4 mt-2">
             <div>
               <p className="text-3xl font-bold text-[#ca5231]">{unreadMessages.length}</p>
-              <p className="text-sm text-[#ca5231]/60">Non lus</p>
+              <p className="text-sm text-[#ca5231]/60">Unread</p>
             </div>
             <div>
               <p className="text-3xl font-bold text-green-500">{readMessages.length}</p>
-              <p className="text-sm text-[#ca5231]/60">Lus</p>
+              <p className="text-sm text-[#ca5231]/60">Read</p>
             </div>
           </div>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-[#ca5231]">Pays différents</h3>
+            <h3 className="text-lg font-semibold text-[#ca5231]">Different Countries</h3>
             <Globe className="h-6 w-6 text-[#ca5231]" />
           </div>
           <p className="text-3xl font-bold text-[#ca5231] mt-2">
             {new Set(locations.map(loc => loc.country)).size}
           </p>
-          <p className="text-sm text-[#ca5231]/60 mt-1">Visiteurs internationaux</p>
+          <p className="text-sm text-[#ca5231]/60 mt-1">International visitors</p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-[#ca5231]">Durée moyenne</h3>
+            <h3 className="text-lg font-semibold text-[#ca5231]">Average Duration</h3>
             <Clock className="h-6 w-6 text-[#ca5231]" />
           </div>
           <p className="text-3xl font-bold text-[#ca5231] mt-2">
             {formatDuration(averageSessionDuration)}
           </p>
-          <p className="text-sm text-[#ca5231]/60 mt-1">Par session</p>
+          <p className="text-sm text-[#ca5231]/60 mt-1">Per session</p>
         </div>
       </div>
 
-      {/* Heures de pointe */}
+      {/* Peak Hours */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
           <Clock className="h-5 w-5 mr-2" />
-          Heures de pointe
+          Peak Hours
         </h3>
         <div className="grid grid-cols-5 gap-4">
           {peakHours.map(({ hour, count }) => (
             <div key={hour} className="text-center">
               <div className="text-2xl font-bold text-[#ca5231]">{hour}h</div>
-              <div className="text-sm text-[#ca5231]/60">{count} visites</div>
+              <div className="text-sm text-[#ca5231]/60">{count} visits</div>
             </div>
           ))}
         </div>
       </div>
 
-      {/* Messages non lus */}
+      {/* Unread Messages */}
       {unreadMessages.length > 0 && (
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
             <MessageSquare className="h-5 w-5 mr-2" />
-            Messages non lus
+            Unread Messages
           </h3>
           <div className="space-y-4">
             {unreadMessages.map((message) => (
@@ -314,11 +314,11 @@ const VisitorsMap: React.FC = () => {
         </div>
       )}
 
-      {/* Carte des visiteurs */}
+      {/* Visitors Map */}
       <div className="bg-white p-6 rounded-lg shadow-md">
         <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
           <Globe className="h-5 w-5 mr-2" />
-          Carte des visiteurs
+          Visitors Map
         </h3>
         <div className="h-[400px] relative">
           <MapContainer
@@ -346,7 +346,7 @@ const VisitorsMap: React.FC = () => {
                     <p className="font-bold">{location.city}</p>
                     <p>{location.region}, {location.country}</p>
                     <p className="mt-1">
-                      {location.count} visite{location.count > 1 ? 's' : ''}
+                      {location.count} visit{location.count > 1 ? 's' : ''}
                     </p>
                   </div>
                 </Popup>
@@ -356,13 +356,13 @@ const VisitorsMap: React.FC = () => {
         </div>
       </div>
 
-      {/* Graphiques */}
+      {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Statistiques par page */}
+        {/* Page Statistics */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
             <Activity className="h-5 w-5 mr-2" />
-            Visites par page
+            Visits by Page
           </h3>
           <div className="h-[300px]">
             <BarChart
@@ -381,11 +381,11 @@ const VisitorsMap: React.FC = () => {
           </div>
         </div>
 
-        {/* Répartition Mobile/Desktop */}
+        {/* Mobile/Desktop Distribution */}
         <div className="bg-white p-6 rounded-lg shadow-md">
           <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
             <Devices className="h-5 w-5 mr-2" />
-            Répartition Mobile/Desktop
+            Mobile/Desktop Distribution
           </h3>
           <div className="h-[300px] flex items-center justify-center">
             <PieChart width={400} height={300}>
@@ -408,11 +408,11 @@ const VisitorsMap: React.FC = () => {
           </div>
         </div>
 
-        {/* Évolution des visites */}
+        {/* Visits Evolution */}
         <div className="bg-white p-6 rounded-lg shadow-md md:col-span-2">
           <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
             <Calendar className="h-5 w-5 mr-2" />
-            Évolution des visites
+            Visits Evolution
           </h3>
           <div className="h-[300px]">
             <LineChart

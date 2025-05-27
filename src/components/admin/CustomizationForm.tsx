@@ -72,19 +72,22 @@ const CustomizationForm: React.FC = () => {
 
       if (error) throw error;
 
-      if (!data) {
-        // If no data exists, create it with default settings
+      if (data?.value) {
+        // Merge existing settings with defaults to ensure all properties exist
+        setSettings({ ...defaultSettings, ...data.value });
+      } else {
+        // If no settings exist, create them with defaults
         const { error: upsertError } = await supabase
           .from('settings')
           .upsert({
             key: 'customization_settings',
             value: defaultSettings
+          }, {
+            onConflict: 'key'
           });
 
         if (upsertError) throw upsertError;
         setSettings(defaultSettings);
-      } else {
-        setSettings(data.value);
       }
     } catch (err) {
       console.error('Erreur lors du chargement des paramètres:', err);
@@ -104,6 +107,8 @@ const CustomizationForm: React.FC = () => {
         .upsert({
           key: 'customization_settings',
           value: settings
+        }, {
+          onConflict: 'key'
         });
 
       if (error) throw error;

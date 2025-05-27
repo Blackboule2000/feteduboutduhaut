@@ -3,7 +3,7 @@ import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 import 'leaflet/dist/leaflet.css';
 import { supabase } from '../../lib/supabase';
-import { MessageSquare, Users, Globe, Clock } from 'lucide-react';
+import { MessageSquare, Users, Globe, Clock, CheckCircle, XCircle, Calendar, Activity } from 'lucide-react';
 
 interface VisitorLocation {
   city: string;
@@ -42,7 +42,9 @@ const VisitorsMap: React.FC = () => {
   const [totalVisits, setTotalVisits] = useState(0);
   const [dailyStats, setDailyStats] = useState<{ date: string; visits: number }[]>([]);
   const [unreadMessages, setUnreadMessages] = useState<ContactMessage[]>([]);
+  const [readMessages, setReadMessages] = useState<ContactMessage[]>([]);
   const [averageSessionDuration, setAverageSessionDuration] = useState(0);
+  const [peakHours, setPeakHours] = useState<{ hour: number; count: number }[]>([]);
 
   useEffect(() => {
     loadStatistics();
@@ -52,21 +54,21 @@ const VisitorsMap: React.FC = () => {
 
   const loadStatistics = async () => {
     try {
-      // Charger les messages non lus
+      // Charger les messages
       const { data: messages } = await supabase
         .from('contact_messages')
         .select('*')
-        .eq('read', false)
         .order('created_at', { ascending: false });
 
       if (messages) {
-        setUnreadMessages(messages);
+        setUnreadMessages(messages.filter(msg => !msg.read));
+        setReadMessages(messages.filter(msg => msg.read));
       }
 
       // Charger les données de localisation
       const { data: locationData } = await supabase
         .from('stats')
-        .select('city, region, country, latitude, longitude, view_count, session_duration')
+        .select('city, region, country, latitude, longitude, view_count, session_duration, created_at')
         .not('latitude', 'is', null)
         .not('longitude', 'is', null);
 
@@ -75,6 +77,20 @@ const VisitorsMap: React.FC = () => {
         const totalDuration = locationData.reduce((sum, curr) => sum + (curr.session_duration || 0), 0);
         const avgDuration = totalDuration / locationData.length || 0;
         setAverageSessionDuration(Math.round(avgDuration));
+
+        // Calculer les heures de pointe
+        const hourCounts = locationData.reduce((acc: Record<number, number>, curr) => {
+          const hour = new Date(curr.created_at).getHours();
+          acc[hour] = (acc[hour] || 0) + (curr.view_count || 1);
+          return acc;
+        }, {});
+
+        setPeakHours(
+          Object.entries(hourCounts)
+            .map(([hour, count]) => ({ hour: parseInt(hour), count }))
+            .sort((a, b) => b.count - a.count)
+            .slice(0, 5)
+        );
 
         // Agréger les données de localisation
         const locationMap = locationData.reduce((acc: Record<string, VisitorLocation>, curr) => {
@@ -173,10 +189,24 @@ const VisitorsMap: React.FC = () => {
     return `${minutes}m ${remainingSeconds}s`;
   };
 
+  const markMessageAsRead = async (messageId: string) => {
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .update({ read: true })
+        .eq('id', messageId);
+
+      if (error) throw error;
+      await loadStatistics(); // Recharger les messages
+    } catch (err) {
+      console.error('Erreur lors du marquage du message:', err);
+    }
+  };
+
   if (loading) {
     return (
       <div className="h-[600px] w-full rounded-lg overflow-hidden shadow-lg bg-gray-50 flex items-center justify-center">
-        <div className="text-yellow-600">Chargement des statistiques...</div>
+        <div className="text-[#ca5231]">Chargement des statistiques...</div>
       </div>
     );
   }
@@ -187,62 +217,97 @@ const VisitorsMap: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-yellow-900">Visites totales</h3>
-            <Users className="h-6 w-6 text-yellow-600" />
+            <h3 className="text-lg font-semibold text-[#ca5231]">Visites totales</h3>
+            <Users className="h-6 w-6 text-[#ca5231]" />
           </div>
-          <p className="text-3xl font-bold text-yellow-600 mt-2">{totalVisits}</p>
-          <p className="text-sm text-gray-500 mt-1">Depuis le début</p>
+          <p className="text-3xl font-bold text-[#ca5231] mt-2">{totalVisits}</p>
+          <p className="text-sm text-[#ca5231]/60 mt-1">Depuis le début</p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-yellow-900">Messages non lus</h3>
-            <MessageSquare className="h-6 w-6 text-yellow-600" />
+            <h3 className="text-lg font-semibold text-[#ca5231]">Messages</h3>
+            <MessageSquare className="h-6 w-6 text-[#ca5231]" />
           </div>
-          <p className="text-3xl font-bold text-yellow-600 mt-2">{unreadMessages.length}</p>
-          <p className="text-sm text-gray-500 mt-1">À traiter</p>
+          <div className="flex items-center space-x-4 mt-2">
+            <div>
+              <p className="text-3xl font-bold text-[#ca5231]">{unreadMessages.length}</p>
+              <p className="text-sm text-[#ca5231]/60">Non lus</p>
+            </div>
+            <div>
+              <p className="text-3xl font-bold text-green-500">{readMessages.length}</p>
+              <p className="text-sm text-[#ca5231]/60">Lus</p>
+            </div>
+          </div>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-yellow-900">Pays différents</h3>
-            <Globe className="h-6 w-6 text-yellow-600" />
+            <h3 className="text-lg font-semibold text-[#ca5231]">Pays différents</h3>
+            <Globe className="h-6 w-6 text-[#ca5231]" />
           </div>
-          <p className="text-3xl font-bold text-yellow-600 mt-2">
+          <p className="text-3xl font-bold text-[#ca5231] mt-2">
             {new Set(locations.map(loc => loc.country)).size}
           </p>
-          <p className="text-sm text-gray-500 mt-1">Visiteurs internationaux</p>
+          <p className="text-sm text-[#ca5231]/60 mt-1">Visiteurs internationaux</p>
         </div>
 
         <div className="bg-white p-6 rounded-lg shadow-md">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-semibold text-yellow-900">Durée moyenne</h3>
-            <Clock className="h-6 w-6 text-yellow-600" />
+            <h3 className="text-lg font-semibold text-[#ca5231]">Durée moyenne</h3>
+            <Clock className="h-6 w-6 text-[#ca5231]" />
           </div>
-          <p className="text-3xl font-bold text-yellow-600 mt-2">
+          <p className="text-3xl font-bold text-[#ca5231] mt-2">
             {formatDuration(averageSessionDuration)}
           </p>
-          <p className="text-sm text-gray-500 mt-1">Par session</p>
+          <p className="text-sm text-[#ca5231]/60 mt-1">Par session</p>
+        </div>
+      </div>
+
+      {/* Heures de pointe */}
+      <div className="bg-white p-6 rounded-lg shadow-md">
+        <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
+          <Clock className="h-5 w-5 mr-2" />
+          Heures de pointe
+        </h3>
+        <div className="grid grid-cols-5 gap-4">
+          {peakHours.map(({ hour, count }) => (
+            <div key={hour} className="text-center">
+              <div className="text-2xl font-bold text-[#ca5231]">{hour}h</div>
+              <div className="text-sm text-[#ca5231]/60">{count} visites</div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Messages non lus */}
       {unreadMessages.length > 0 && (
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-yellow-900 mb-4">Derniers messages non lus</h3>
+          <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
+            <MessageSquare className="h-5 w-5 mr-2" />
+            Messages non lus
+          </h3>
           <div className="space-y-4">
             {unreadMessages.map((message) => (
-              <div key={message.id} className="border-l-4 border-yellow-500 pl-4 py-2">
+              <div key={message.id} className="border-l-4 border-[#ca5231] pl-4 py-2">
                 <div className="flex justify-between items-start">
                   <div>
-                    <h4 className="font-semibold text-yellow-900">{message.name}</h4>
-                    <p className="text-sm text-gray-600">{message.email}</p>
+                    <h4 className="font-semibold text-[#ca5231]">{message.name}</h4>
+                    <p className="text-sm text-[#ca5231]/60">{message.email}</p>
                   </div>
-                  <span className="text-sm text-gray-500">
-                    {new Date(message.created_at).toLocaleDateString('fr-FR')}
-                  </span>
+                  <div className="flex items-center space-x-4">
+                    <span className="text-sm text-[#ca5231]/60">
+                      {new Date(message.created_at).toLocaleDateString('fr-FR')}
+                    </span>
+                    <button
+                      onClick={() => markMessageAsRead(message.id)}
+                      className="text-green-500 hover:text-green-600"
+                    >
+                      <CheckCircle className="h-5 w-5" />
+                    </button>
+                  </div>
                 </div>
-                <p className="mt-2 text-gray-700">{message.message}</p>
+                <p className="mt-2 text-[#ca5231]/80">{message.message}</p>
               </div>
             ))}
           </div>
@@ -251,7 +316,10 @@ const VisitorsMap: React.FC = () => {
 
       {/* Carte des visiteurs */}
       <div className="bg-white p-6 rounded-lg shadow-md">
-        <h3 className="text-lg font-semibold text-yellow-900 mb-4">Carte des visiteurs</h3>
+        <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
+          <Globe className="h-5 w-5 mr-2" />
+          Carte des visiteurs
+        </h3>
         <div className="h-[400px] relative">
           <MapContainer
             center={[46.603354, 1.888334]}
@@ -292,7 +360,10 @@ const VisitorsMap: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Statistiques par page */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-yellow-900 mb-4">Visites par page</h3>
+          <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
+            <Activity className="h-5 w-5 mr-2" />
+            Visites par page
+          </h3>
           <div className="h-[300px]">
             <BarChart
               width={500}
@@ -312,7 +383,10 @@ const VisitorsMap: React.FC = () => {
 
         {/* Répartition Mobile/Desktop */}
         <div className="bg-white p-6 rounded-lg shadow-md">
-          <h3 className="text-lg font-semibold text-yellow-900 mb-4">Répartition Mobile/Desktop</h3>
+          <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
+            <Devices className="h-5 w-5 mr-2" />
+            Répartition Mobile/Desktop
+          </h3>
           <div className="h-[300px] flex items-center justify-center">
             <PieChart width={400} height={300}>
               <Pie
@@ -336,7 +410,10 @@ const VisitorsMap: React.FC = () => {
 
         {/* Évolution des visites */}
         <div className="bg-white p-6 rounded-lg shadow-md md:col-span-2">
-          <h3 className="text-lg font-semibold text-yellow-900 mb-4">Évolution des visites</h3>
+          <h3 className="text-lg font-semibold text-[#ca5231] mb-4 flex items-center">
+            <Calendar className="h-5 w-5 mr-2" />
+            Évolution des visites
+          </h3>
           <div className="h-[300px]">
             <LineChart
               width={1000}

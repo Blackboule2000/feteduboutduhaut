@@ -75,7 +75,7 @@ const Contact: React.FC = () => {
                       href="mailto:association.boutduhaut@gmail.com" 
                       className="text-[#ca5231]/80 hover:text-[#ca5231] transition-colors font-['Rainy Days'] text-lg"
                     >
-                      association.boutduhaut@gmail.com
+                      associationduboutduhaut@gmail.com
                     </a>
                   </div>
                 </div>
@@ -90,7 +90,7 @@ const Contact: React.FC = () => {
                       href="tel:+33623456789" 
                       className="text-[#ca5231]/80 hover:text-[#ca5231] transition-colors font-['Rainy Days'] text-lg"
                     >
-                      +33 (0)6 23 45 67 89
+                      +33 (0)6 17 41 33 46
                     </a>
                   </div>
                 </div>

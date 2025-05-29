@@ -75,7 +75,7 @@ const Contact: React.FC = () => {
                       href="mailto:association.boutduhaut@gmail.com" 
                       className="text-[#ca5231]/80 hover:text-[#ca5231] transition-colors font-['Rainy Days'] text-lg"
                     >
-                      associationduboutduhaut@gmail.com
+                      assoduboutduhaut@gmail.com
                     </a>
                   </div>
                 </div>

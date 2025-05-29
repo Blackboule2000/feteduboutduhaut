@@ -207,6 +207,19 @@ const Schedule: React.FC = () => {
     concert.title !== "Anna Rudy & Paul Lazarus"
   );
 
+  // Function to move "Anna Rudy & Paul Lazarus" to the end
+  const moveAfterPartyToEnd = (programList: Program[]): Program[] => {
+    const afterPartyIndex = programList.findIndex(concert => concert.title === "Anna Rudy & Paul Lazarus");
+    if (afterPartyIndex === -1) {
+      return programList;
+    }
+    const afterPartyConcert = programList.splice(afterPartyIndex, 1)[0];
+    programList.push(afterPartyConcert);
+    return programList;
+  };
+
+  const finalSortedProgram = moveAfterPartyToEnd([...sortedProgram]);
+
   return (
     <section id="programme" className="relative py-20 bg-festival-turquoise overflow-hidden">
       <div className="absolute inset-0 bg-retro-pattern opacity-10"></div>
@@ -266,7 +279,7 @@ const Schedule: React.FC = () => {
             HORAIRES DES CONCERTS
           </h3>
           <div className="space-y-4">
-            {sortedProgram.map((concert) => (
+            {finalSortedProgram.map((concert) => (
               <div 
                 key={concert.id}
                 className="flex items-center justify-between p-4 hover:bg-white/30 rounded-lg transition-colors duration-300"

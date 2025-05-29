@@ -45,7 +45,7 @@ const Information: React.FC = () => {
 
   const essentialInfo = [
     { icon: Calendar, title: 'Date', text: 'Samedi 26 Juillet 2025' },
-    { icon: Clock, title: 'Horaires', text: 'De 11h00 à 02h30 du matin' },
+    { icon: Clock, title: 'Horaires', text: 'De 11h00 à 02h30' },
     { icon: MapPin, title: 'Lieu', text: '2 rue du Bout du Haut, 60380 Lachapelle sous Gerberoy' },
     { icon: Music, title: 'Concerts', text: '5 concerts sur 2 scènes' },
     { icon: Beer, title: 'Bar & Food', text: 'Buvette et restauration sur place' },

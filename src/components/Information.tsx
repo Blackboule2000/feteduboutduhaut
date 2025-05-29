@@ -70,7 +70,7 @@ const Information: React.FC = () => {
       items: [
         'Gobelets réutilisables consignés',
         'Tri sélectif avec points de collecte dédiés',
-        'Vaisselle réutilisable consignée pour la restauration',
+        'Vaisselle réutilisable pour la restauration',
         'Sensibilisation au tri avec des bénévoles'
       ]
     },

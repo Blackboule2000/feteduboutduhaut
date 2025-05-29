@@ -207,7 +207,7 @@ const Information: React.FC = () => {
               <div className="bg-[#f6d9a0] rounded-xl overflow-hidden shadow-lg">
                 <div className="aspect-[21/9] relative">
                   <iframe 
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2579.675897572147!2d1.8431753760982296!3d49.68152437170658!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e70d3e398d62d3%3A0xe26a39dff46a3e4f!2sLachapelle-sous-Gerberoy!5e0!3m2!1sfr!2sfr!4v1716824042352!5m2!1sfr!2sfr"
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2579.675897572147!2d1.8431753760982296!3d49.68152437170658!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x47e70d3e398d62d3%3A0xe26a39dff46a3e4f!2s2%20Rue%20du%20Bout%20du%20Haut%2C%2060380%20Lachapelle-sous-Gerberoy!5e0!3m2!1sfr!2sfr!4v1716824042352!5m2!1sfr!2sfr"
                     width="100%"
                     height="100%"
                     style={{ border: 0 }}

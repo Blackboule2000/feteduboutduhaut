@@ -288,7 +288,7 @@ const Information: React.FC = () => {
                   </h3>
                   <p className="font-['Rainy Days'] text-[#ca5231]/80">
                     Et le plus beau ? Vous, spectateurs et spectatrices de la Fête du Bout du Haut, êtes 
-                    invité.e.s à devenir acteurs de cette production d'énergie ! Avant les concerts, participez 
+                    invité.e.s à devenir acteurs et actrices de cette production d'énergie ! Avant les concerts, participez 
                     à des actions ludiques de sensibilisation à la maîtrise de l'énergie en pédalant. Et pendant 
                     les concerts, continuez à faire vivre la scène par votre énergie collective !
                   </p>

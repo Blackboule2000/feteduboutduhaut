@@ -43,10 +43,33 @@ const getVisitorId = (): string => {
   return visitorId;
 };
 
+// Check if the user is an admin
+const isAdmin = async (): Promise<boolean> => {
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session) return false;
+
+  // Assuming admin users are those logged in on the /admin routes
+  const path = window.location.pathname;
+  return path.startsWith('/admin');
+};
+
 export const trackPageView = async (page: string) => {
   try {
     // Don't track bots
     if (isBot(navigator.userAgent)) {
+      return null;
+    }
+
+    // Don't track admin users
+    if (await isAdmin()) {
+      console.log('Admin visit, not tracking.');
+      return null;
+    }
+
+    // Ensure page view is only tracked once per session
+    const hasTrackedPageView = sessionStorage.getItem('tracked_page_view');
+    if (hasTrackedPageView) {
+      console.log('Page view already tracked this session, not tracking again.');
       return null;
     }
 
@@ -123,6 +146,10 @@ export const trackPageView = async (page: string) => {
       }]);
 
     if (error) throw error;
+
+    // Mark page view as tracked
+    sessionStorage.setItem('tracked_page_view', 'true');
+
     return data;
   } catch (error) {
     console.error('Error tracking page view:', error);

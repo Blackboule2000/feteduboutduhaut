@@ -96,7 +96,7 @@ const Hero: React.FC = () => {
           </div>
           
           <img 
-            src="https://scontent.fcdg3-1.fna.fbcdn.net/v/t39.30808-6/499906655_701061362622647_5383269116507643545_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=75d36f&_nc_ohc=IUbuOma3sJEQ7kNvwEygvYP&_nc_oc=AdmaGANqE3CLIa439j1bNU2Wo2C91Sd8WV7fHYHCw7gF8RGPMpE52VobeZQLBO8wZQ-6borRkDGPHheUHHxsX49y&_nc_zt=23&_nc_ht=scontent.fcdg3-1.fna&_nc_gid=xOUzboblEIGXrGOJY9NrRQ&oh=00_AfIwIQIP6LB00wEr5Yi6EOsc9_qsB15KWJs_zk6PPPrYSA&oe=683B6F6A"
+            src="http://www.image-heberg.fr/files/17486307723391673572.jpg" 
             alt="Affiche Fête du Bout du Haut 2025"
             className="w-full h-auto rounded-lg shadow-2xl mb-12"
           />

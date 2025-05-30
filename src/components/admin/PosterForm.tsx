@@ -9,7 +9,7 @@ interface PosterSettings {
 }
 
 const defaultSettings: PosterSettings = {
-  image_url: 'https://i.ibb.co/FL3xY1gP/FDBH-2025-R-cup-r-R-cup-r-R-cup-r.jpg',
+  image_url: 'https://scontent.fcdg3-1.fna.fbcdn.net/v/t39.30808-6/495958790_703519705710146_8991981976877763425_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_ohc=4i1cJWx3QrYQ7kNvwHWC31y&_nc_oc=AdlAkJoR8yGuRBCZPiaNt_8LU_2gZVM4j0x6J1bUBUFWKnbIZEU4GgHH2h5UkvucVW_x5HFoFJsTKa6GWGSbf7D8&_nc_zt=23&_nc_ht=scontent.fcdg3-1.fna&_nc_gid=eR8ULIH8RFj1pxvNZ7Ri_w&oh=00_AfJLk_MAnXcY5uEBzu5kivF9xvX_iuGrudTAdeXqwCWSDw&oe=683FDFF9',
   alt_text: 'Affiche Fête du Bout du Haut 2025',
   enabled: true
 };

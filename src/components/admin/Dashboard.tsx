@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Settings, BarChart, Newspaper, Activity, Info, Users, Layout } from 'lucide-react';
+import { LogOut, Settings, Newspaper, Activity, Info, Users, Layout } from 'lucide-react';
 import NewsForm from './NewsForm';
 import ActivityForm from './ActivityForm';
-import VisitorsMap from './VisitorsMap';
 import CustomizationForm from './CustomizationForm';
 import HeaderForm from './HeaderForm';
 import ProgramForm from './ProgramForm';
 import InformationForm from './InformationForm';
 import PartnersForm from './PartnersForm';
+import OverviewDashboard from './OverviewDashboard';
 
 function Dashboard() {
   const [activeTab, setActiveTab] = useState('overview');
@@ -58,7 +58,7 @@ function Dashboard() {
         <div className="mb-6 border-b border-yellow-200">
           <nav className="-mb-px flex space-x-8">
             {[
-              { id: 'overview', name: 'Vue d\'ensemble', icon: BarChart },
+              { id: 'overview', name: 'Vue d\'ensemble', icon: Layout },
               { id: 'header', name: 'Bandeau', icon: Layout },
               { id: 'program', name: 'Programme', icon: Activity },
               { id: 'news', name: 'Actualités', icon: Newspaper },
@@ -85,12 +85,7 @@ function Dashboard() {
 
         <div className="bg-white shadow rounded-lg p-6">
           {activeTab === 'overview' && (
-            <div className="space-y-6">
-              <h2 className="text-xl font-bold text-yellow-900">Vue d'ensemble</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <VisitorsMap />
-              </div>
-            </div>
+            <OverviewDashboard />
           )}
 
           {activeTab === 'header' && (

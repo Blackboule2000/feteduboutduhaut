@@ -15,7 +15,7 @@ import {
 } from 'chart.js';
 import { Line, Bar, Pie } from 'react-chartjs-2';
 import 'leaflet/dist/leaflet.css';
-import { Users, Globe, Clock, MessageSquare, Calendar, Activity, Dices as Devices } from 'lucide-react';
+import { Users, Globe, Clock, MessageSquare, Calendar, Activity, Dices as Devices, CheckCircle } from 'lucide-react'; // <-- MODIFICATION ICI : Ajout de CheckCircle
 import { MapContainer, TileLayer, CircleMarker, Popup } from 'react-leaflet';
 
 // Register ChartJS components
@@ -88,7 +88,7 @@ const OverviewDashboard: React.FC = () => {
     maintainAspectRatio: false,
     plugins: {
       legend: {
-        position: 'top' as const,
+        position: 'top', // <-- MODIFICATION ICI : 'as const' a été retiré
         labels: {
           font: {
             family: "'Inter', sans-serif",
@@ -129,6 +129,7 @@ const OverviewDashboard: React.FC = () => {
         }
       },
       y: {
+        beginAtZero: true, // Assure que l'axe Y commence à zéro
         grid: {
           color: CHART_COLORS.border,
           drawBorder: false
@@ -183,11 +184,18 @@ const OverviewDashboard: React.FC = () => {
       }
 
       // Load statistics with date filter
-      const { data: stats } = await supabase
-        .from('stats')
+      // Note: Make sure the 'stats' table exists in your Supabase database
+      // and has appropriate columns (e.g., latitude, longitude, page_view, user_agent, view_count, session_duration, created_at)
+      const { data: stats, error: statsError } = await supabase
+        .from('stats') // <-- Assurez-vous que cette table existe ou ajustez-la si elle s'appelle 'visitors' par exemple
         .select('*')
         .gte('created_at', rangeStart.toISOString())
         .order('created_at', { ascending: true });
+
+      if (statsError) {
+        console.error('Error fetching stats:', statsError);
+        // Vous pourriez vouloir afficher une erreur à l'utilisateur ici
+      }
 
       if (stats) {
         // Process locations
@@ -213,7 +221,7 @@ const OverviewDashboard: React.FC = () => {
 
         // Process page views
         const pageViewMap = stats.reduce((acc: Record<string, number>, curr) => {
-          const page = curr.page_view.replace('/', '') || 'Home';
+          const page = curr.page_view?.replace('/', '') || 'Home'; // Utilisation de ?. pour la sécurité
           acc[page] = (acc[page] || 0) + (curr.view_count || 1);
           return acc;
         }, {});
@@ -225,7 +233,7 @@ const OverviewDashboard: React.FC = () => {
 
         // Process device stats
         const deviceMap = stats.reduce((acc: Record<string, number>, curr) => {
-          const device = curr.user_agent?.includes('Mobile') ? 'Mobile' : 'Desktop';
+          const device = curr.user_agent?.includes('Mobile') ? 'Mobile' : 'Desktop'; // Utilisation de ?.
           acc[device] = (acc[device] || 0) + (curr.view_count || 1);
           return acc;
         }, {});

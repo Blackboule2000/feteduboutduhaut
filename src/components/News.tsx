@@ -90,7 +90,7 @@ const News: React.FC = () => {
 
   if (loading) {
     return (
-      <section id="actualités" className="py-20 relative overflow-hidden bg-[#f6d9a0]">
+      <section id="actualités\" className="py-20 relative overflow-hidden bg-[#f6d9a0]">
         <div className="container mx-auto px-4">
           <div className="text-center">Chargement des actualités...</div>
         </div>

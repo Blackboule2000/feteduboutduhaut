@@ -18,6 +18,7 @@ const News: React.FC = () => {
   const [selectedNews, setSelectedNews] = useState<NewsItem | null>(null);
   const [selectedNewsIndex, setSelectedNewsIndex] = useState<number>(0);
   const [isModalEntering, setIsModalEntering] = useState(false);
+  const [videoError, setVideoError] = useState<string | null>(null);
 
   useEffect(() => {
     loadNews();
@@ -69,6 +70,7 @@ const News: React.FC = () => {
     setSelectedNews(news);
     setIsModalEntering(true);
     document.body.style.overflow = 'hidden';
+    setVideoError(null);
   };
 
   const closeModal = () => {
@@ -76,6 +78,7 @@ const News: React.FC = () => {
     setTimeout(() => {
       setSelectedNews(null);
       document.body.style.overflow = '';
+      setVideoError(null);
     }, 300);
   };
 
@@ -86,11 +89,50 @@ const News: React.FC = () => {
     
     setSelectedNewsIndex(newIndex);
     setSelectedNews(newsData[newIndex]);
+    setVideoError(null);
+  };
+
+  const handleVideoError = () => {
+    setVideoError('La vidéo ne peut pas être chargée. Veuillez réessayer plus tard.');
+  };
+
+  const VideoPlayer: React.FC<{ url: string }> = ({ url }) => {
+    const [isLoading, setIsLoading] = useState(true);
+
+    useEffect(() => {
+      const timer = setTimeout(() => {
+        setIsLoading(false);
+      }, 2000);
+
+      return () => clearTimeout(timer);
+    }, []);
+
+    return (
+      <div className="relative aspect-video w-full overflow-hidden rounded-lg bg-black/5">
+        {isLoading && (
+          <div className="absolute inset-0 flex items-center justify-center bg-black/10">
+            <div className="h-8 w-8 animate-spin rounded-full border-4 border-white border-t-transparent"></div>
+          </div>
+        )}
+        <iframe
+          src={url}
+          className="absolute inset-0 h-full w-full"
+          style={{ 
+            opacity: isLoading ? 0 : 1,
+            transition: 'opacity 0.3s ease-in-out'
+          }}
+          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+          allowFullScreen
+          onError={handleVideoError}
+          loading="lazy"
+        />
+      </div>
+    );
   };
 
   if (loading) {
     return (
-      <section id="actualités\" className="py-20 relative overflow-hidden bg-[#f6d9a0]">
+      <section id="actualités" className="py-20 relative overflow-hidden bg-[#f6d9a0]">
         <div className="container mx-auto px-4">
           <div className="text-center">Chargement des actualités...</div>
         </div>
@@ -266,19 +308,22 @@ const News: React.FC = () => {
             <div className="tape tape-left"></div>
             <div className="tape tape-right"></div>
 
-            <div className="relative aspect-video mb-8 rounded-lg overflow-hidden shadow-xl">
+            <div className="relative mb-8 rounded-lg overflow-hidden shadow-xl">
               {selectedNews.video_url ? (
-                <iframe
-                  src={selectedNews.video_url}
-                  className="w-full h-full"
-                  allowFullScreen
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                />
+                <>
+                  <VideoPlayer url={selectedNews.video_url} />
+                  {videoError && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/50 text-white text-center p-4">
+                      <p>{videoError}</p>
+                    </div>
+                  )}
+                </>
               ) : (
                 <img
                   src={selectedNews.image_url}
                   alt={selectedNews.title}
                   className="w-full h-full object-cover"
+                  loading="lazy"
                 />
               )}
             </div>

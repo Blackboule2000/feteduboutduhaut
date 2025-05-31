@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, X, ArrowRight, Video } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 interface NewsItem {
@@ -8,6 +8,7 @@ interface NewsItem {
   date: string;
   description: string;
   image_url: string;
+  video_url?: string;
 }
 
 const News: React.FC = () => {
@@ -175,6 +176,12 @@ const News: React.FC = () => {
                     <p className="text-xl text-[#ca5231]/80 line-clamp-3 font-['Rainy Days'] leading-relaxed">
                       {news.description}
                     </p>
+                    {news.video_url && (
+                      <div className="mt-4 flex items-center justify-center text-[#ca5231]">
+                        <Video className="h-5 w-5 mr-2" />
+                        <span className="font-['Railroad Gothic']">Vidéo disponible</span>
+                      </div>
+                    )}
                   </div>
                 </div>
               </div>
@@ -260,11 +267,20 @@ const News: React.FC = () => {
             <div className="tape tape-right"></div>
 
             <div className="relative aspect-video mb-8 rounded-lg overflow-hidden shadow-xl">
-              <img
-                src={selectedNews.image_url}
-                alt={selectedNews.title}
-                className="w-full h-full object-cover"
-              />
+              {selectedNews.video_url ? (
+                <iframe
+                  src={selectedNews.video_url}
+                  className="w-full h-full"
+                  allowFullScreen
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                />
+              ) : (
+                <img
+                  src={selectedNews.image_url}
+                  alt={selectedNews.title}
+                  className="w-full h-full object-cover"
+                />
+              )}
             </div>
 
             <div className="p-8 pt-0">

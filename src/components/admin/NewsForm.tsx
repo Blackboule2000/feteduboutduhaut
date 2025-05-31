@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { supabase } from '../../lib/supabase';
-import { Plus, Edit, Trash2, X } from 'lucide-react';
+import { Plus, Edit, Trash2, X, Video } from 'lucide-react';
 
 interface NewsItem {
   id: string;
@@ -8,6 +8,7 @@ interface NewsItem {
   date: string;
   description: string;
   image_url: string;
+  video_url?: string;
 }
 
 const NewsForm: React.FC = () => {
@@ -49,7 +50,8 @@ const NewsForm: React.FC = () => {
             title: selectedNews.title,
             date: selectedNews.date,
             description: selectedNews.description,
-            image_url: selectedNews.image_url
+            image_url: selectedNews.image_url,
+            video_url: selectedNews.video_url
           })
           .eq('id', selectedNews.id);
 
@@ -61,7 +63,8 @@ const NewsForm: React.FC = () => {
             title: selectedNews.title,
             date: selectedNews.date,
             description: selectedNews.description,
-            image_url: selectedNews.image_url
+            image_url: selectedNews.image_url,
+            video_url: selectedNews.video_url
           }]);
 
         if (error) throw error;
@@ -97,6 +100,32 @@ const NewsForm: React.FC = () => {
     }
   };
 
+  const handleVideoUrlChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let url = e.target.value;
+    // Convert YouTube watch URLs to embed URLs
+    if (url.includes('youtube.com/watch?v=')) {
+      const videoId = url.split('v=')[1]?.split('&')[0];
+      if (videoId) {
+        url = `https://www.youtube.com/embed/${videoId}`;
+      }
+    }
+    // Convert YouTube short URLs
+    else if (url.includes('youtu.be/')) {
+      const videoId = url.split('youtu.be/')[1]?.split('?')[0];
+      if (videoId) {
+        url = `https://www.youtube.com/embed/${videoId}`;
+      }
+    }
+    // Convert Vimeo URLs
+    else if (url.includes('vimeo.com/')) {
+      const videoId = url.split('vimeo.com/')[1]?.split('?')[0];
+      if (videoId) {
+        url = `https://player.vimeo.com/video/${videoId}`;
+      }
+    }
+    setSelectedNews(prev => prev ? { ...prev, video_url: url } : null);
+  };
+
   return (
     <div className="space-y-6">
       {error && (
@@ -113,7 +142,8 @@ const NewsForm: React.FC = () => {
               title: '',
               date: new Date().toISOString().split('T')[0],
               description: '',
-              image_url: ''
+              image_url: '',
+              video_url: ''
             });
             setShowForm(true);
           }}
@@ -144,6 +174,12 @@ const NewsForm: React.FC = () => {
                     <p className="text-sm text-gray-500">
                       {new Date(item.date).toLocaleDateString()}
                     </p>
+                    {item.video_url && (
+                      <div className="flex items-center text-yellow-600 mt-1">
+                        <Video className="h-4 w-4 mr-1" />
+                        <span className="text-sm">Vidéo incluse</span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 <div className="flex items-center space-x-2">
@@ -243,6 +279,31 @@ const NewsForm: React.FC = () => {
                     alt="Aperçu"
                     className="mt-2 max-h-48 rounded"
                   />
+                )}
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-yellow-700 mb-1">
+                  URL de la vidéo (YouTube/Vimeo)
+                </label>
+                <input
+                  type="url"
+                  value={selectedNews.video_url}
+                  onChange={handleVideoUrlChange}
+                  className="w-full px-4 py-2 border border-yellow-300 rounded-md focus:ring-yellow-500 focus:border-yellow-500"
+                  placeholder="https://youtube.com/watch?v=... ou https://vimeo.com/..."
+                />
+                <p className="mt-1 text-sm text-gray-500">
+                  Collez l'URL de la vidéo YouTube ou Vimeo. Le lien sera automatiquement converti au format d'intégration.
+                </p>
+                {selectedNews.video_url && (
+                  <div className="mt-4 aspect-video">
+                    <iframe
+                      src={selectedNews.video_url}
+                      className="w-full h-full rounded-lg"
+                      allowFullScreen
+                    />
+                  </div>
                 )}
               </div>
 

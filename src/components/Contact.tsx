@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, Phone, Facebook, Instagram, Send, MapPin } from 'lucide-react';
+import { Mail, Phone, Facebook, Instagram, Youtube, Send, MapPin } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 const Contact: React.FC = () => {
@@ -129,6 +129,14 @@ const Contact: React.FC = () => {
                     className="bg-[#ca5231] p-3 rounded-full text-white hover:bg-[#ca5231]/80 transition-colors transform hover:rotate-12 transition-transform duration-300"
                   >
                     <Instagram className="h-6 w-6" />
+                  </a>
+                  <a 
+                    href="https://www.youtube.com/@AssociationduBoutduHaut" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="bg-[#ca5231] p-3 rounded-full text-white hover:bg-[#ca5231]/80 transition-colors transform hover:rotate-12 transition-transform duration-300"
+                  >
+                    <Youtube className="h-6 w-6" />
                   </a>
                 </div>
               </div>

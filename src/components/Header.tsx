@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Facebook, Instagram, Youtube } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 
@@ -234,7 +234,7 @@ const Header: React.FC = () => {
             )}
           </div>
           
-          <nav className="hidden md:flex space-x-8">
+          <nav className="hidden md:flex items-center space-x-8">
             {settings.navigation.map((item) => (
               <a
                 key={item.text}
@@ -259,6 +259,54 @@ const Header: React.FC = () => {
                 ></span>
               </a>
             ))}
+
+            <div className="flex items-center space-x-4 ml-8">
+              <a
+                href="https://www.facebook.com/AssociationDuBoutDuHaut/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transform transition-all duration-300 hover:scale-110"
+                style={{ color: settings.styles.text_color }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = settings.styles.hover_color;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = settings.styles.text_color;
+                }}
+              >
+                <Facebook className="h-5 w-5" />
+              </a>
+              <a
+                href="https://www.instagram.com/association_du_bout_du_haut/"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transform transition-all duration-300 hover:scale-110"
+                style={{ color: settings.styles.text_color }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = settings.styles.hover_color;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = settings.styles.text_color;
+                }}
+              >
+                <Instagram className="h-5 w-5" />
+              </a>
+              <a
+                href="https://www.youtube.com/@AssociationduBoutduHaut"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="transform transition-all duration-300 hover:scale-110"
+                style={{ color: settings.styles.text_color }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.color = settings.styles.hover_color;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.color = settings.styles.text_color;
+                }}
+              >
+                <Youtube className="h-5 w-5" />
+              </a>
+            </div>
           </nav>
           
           <button 
@@ -284,6 +332,35 @@ const Header: React.FC = () => {
                   {item.text}
                 </a>
               ))}
+              <div className="flex space-x-4 pt-4 border-t border-gray-200">
+                <a
+                  href="https://www.facebook.com/AssociationDuBoutDuHaut/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transform transition-all duration-300 hover:scale-110"
+                  style={{ color: settings.styles.text_color }}
+                >
+                  <Facebook className="h-5 w-5" />
+                </a>
+                <a
+                  href="https://www.instagram.com/association_du_bout_du_haut/"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transform transition-all duration-300 hover:scale-110"
+                  style={{ color: settings.styles.text_color }}
+                >
+                  <Instagram className="h-5 w-5" />
+                </a>
+                <a
+                  href="https://www.youtube.com/@AssociationduBoutduHaut"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="transform transition-all duration-300 hover:scale-110"
+                  style={{ color: settings.styles.text_color }}
+                >
+                  <Youtube className="h-5 w-5" />
+                </a>
+              </div>
             </nav>
           </div>
         )}

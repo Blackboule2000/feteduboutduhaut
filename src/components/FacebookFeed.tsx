@@ -2,7 +2,7 @@ import React from 'react';
 
 const FacebookFeed: React.FC = () => {
   return (
-    <div className="w-full max-w-4xl mx-auto">
+    <div className="w-full max-w-full mx-auto">
       <h3 className="text-2xl font-['Swiss 721 Black Extended BT'] text-[#ca5231] mb-6 text-center">
         Suivez-nous sur Facebook !
       </h3>
@@ -12,7 +12,7 @@ const FacebookFeed: React.FC = () => {
           className="fb-page"
           data-href="https://www.facebook.com/AssociationDuBoutDuHaut"
           data-tabs="timeline"
-          data-width="800"
+          data-width="1000"
           data-height="400"
           data-small-header="false"
           data-adapt-container-width="true"

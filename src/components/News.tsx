@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ChevronLeft, ChevronRight, X, ArrowRight, Video } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import FacebookFeed from './FacebookFeed';
 
 interface NewsItem {
   id: string;
@@ -258,11 +257,6 @@ const News: React.FC = () => {
               />
             ))}
           </div>
-        </div>
-
-        {/* Facebook Feed Section */}
-        <div className="mt-16">
-          <FacebookFeed />
         </div>
       </div>
 

@@ -9,7 +9,7 @@ interface PosterSettings {
 }
 
 const defaultSettings: PosterSettings = {
-  image_url: 'https://scontent.fcdg3-1.fna.fbcdn.net/v/t39.30808-6/495958790_703519705710146_8991981976877763425_n.jpg?_nc_cat=103&ccb=1-7&_nc_sid=127cfc&_nc_ohc=4i1cJWx3QrYQ7kNvwHWC31y&_nc_oc=AdlAkJoR8yGuRBCZPiaNt_8LU_2gZVM4j0x6J1bUBUFWKnbIZEU4GgHH2h5UkvucVW_x5HFoFJsTKa6GWGSbf7D8&_nc_zt=23&_nc_ht=scontent.fcdg3-1.fna&_nc_gid=eR8ULIH8RFj1pxvNZ7Ri_w&oh=00_AfJLk_MAnXcY5uEBzu5kivF9xvX_iuGrudTAdeXqwCWSDw&oe=683FDFF9',
+  image_url: https://scontent.fcdg3-1.fna.fbcdn.net/v/t39.30808-6/502629123_707713045290812_7175619882336714234_n.jpg?_nc_cat=108&ccb=1-7&_nc_sid=75d36f&_nc_ohc=2Rf81NCHIMAQ7kNvwG95lyY&_nc_oc=Adl9OC8ECn77F9Z-o1lF-_L10As3OEdx0GMUNP2e3Tiav_WG-nNlQqjPzUG4mfQ3iEjwdHjCcqvBSNHA9Tf9_Zbg&_nc_zt=23&_nc_ht=scontent.fcdg3-1.fna&_nc_gid=kWu5DM0-FeRj-iEzd4Fq6A&oh=00_AfMjxAQyaXi5ImzqhUeILQ3vgSooAWET0F6YrFNI5lBBQA&oe=6847336D,
   alt_text: 'Affiche Fête du Bout du Haut 2025',
   enabled: true
 };

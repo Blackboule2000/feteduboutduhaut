@@ -1,12 +1,6 @@
-import React, { useEffect } from 'react';
+import React from 'react';
 
 const FacebookFeed: React.FC = () => {
-  useEffect(() => {
-    if (window.FB) {
-      window.FB.XFBML.parse();
-    }
-  }, []);
-
   return (
     <div className="relative group">
       <div className="absolute inset-0 bg-[#ca5231]/20 blur-xl transform group-hover:scale-105 transition-transform duration-500"></div>

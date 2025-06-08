@@ -1,11 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useNavigate } from 'react-router-dom';
-import { LogOut, Settings, Newspaper, Activity, Info, Users, Layout } from 'lucide-react';
+import { LogOut, Settings, Newspaper, Activity, Info, Users, Layout, Home } from 'lucide-react';
 import NewsForm from './NewsForm';
 import ActivityForm from './ActivityForm';
 import CustomizationForm from './CustomizationForm';
 import HeaderForm from './HeaderForm';
+import HeroForm from './HeroForm';
 import ProgramForm from './ProgramForm';
 import InformationForm from './InformationForm';
 import PartnersForm from './PartnersForm';
@@ -59,6 +60,7 @@ function Dashboard() {
           <nav className="-mb-px flex space-x-8">
             {[
               { id: 'overview', name: 'Vue d\'ensemble', icon: Layout },
+              { id: 'hero', name: 'Accueil', icon: Home },
               { id: 'header', name: 'Bandeau', icon: Layout },
               { id: 'program', name: 'Programme', icon: Activity },
               { id: 'news', name: 'Actualités', icon: Newspaper },
@@ -86,6 +88,15 @@ function Dashboard() {
         <div className="bg-white shadow rounded-lg p-6">
           {activeTab === 'overview' && (
             <OverviewDashboard />
+          )}
+
+          {activeTab === 'hero' && (
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-bold text-yellow-900">Gestion de la page d'accueil</h2>
+              </div>
+              <HeroForm />
+            </div>
           )}
 
           {activeTab === 'header' && (

@@ -67,7 +67,7 @@ const HeroForm: React.FC = () => {
           .upsert({
             key: 'hero_settings',
             value: defaultSettings
-          });
+          }, { onConflict: 'key' });
 
         if (upsertError) throw upsertError;
         setSettings(defaultSettings);
@@ -93,7 +93,7 @@ const HeroForm: React.FC = () => {
         .upsert({
           key: 'hero_settings',
           value: settings
-        });
+        }, { onConflict: 'key' });
 
       if (error) throw error;
       
@@ -136,7 +136,7 @@ const HeroForm: React.FC = () => {
         .upsert({
           key: 'hero_settings',
           value: newSettings
-        });
+        }, { onConflict: 'key' });
 
       if (error) throw error;
 

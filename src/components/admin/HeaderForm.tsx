@@ -94,7 +94,7 @@ const HeaderForm: React.FC = () => {
           .upsert({
             key: 'header_settings',
             value: defaultSettings
-          });
+          }, { onConflict: 'key' });
 
         if (upsertError) throw upsertError;
         setSettings(defaultSettings);
@@ -119,7 +119,7 @@ const HeaderForm: React.FC = () => {
         .upsert({
           key: 'header_settings',
           value: settings
-        });
+        }, { onConflict: 'key' });
 
       if (error) throw error;
       setSuccess(true);

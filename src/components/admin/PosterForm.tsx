@@ -40,7 +40,7 @@ const PosterForm: React.FC = () => {
           .upsert({
             key: 'poster_settings',
             value: defaultSettings
-          });
+          }, { onConflict: 'key' });
 
         if (upsertError) throw upsertError;
         setSettings(defaultSettings);
@@ -65,7 +65,7 @@ const PosterForm: React.FC = () => {
         .upsert({
           key: 'poster_settings',
           value: settings
-        });
+        }, { onConflict: 'key' });
 
       if (error) throw error;
 

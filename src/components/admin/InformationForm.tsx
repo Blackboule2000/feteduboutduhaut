@@ -134,10 +134,10 @@ const InformationForm: React.FC = () => {
         // If no data exists, create it with default settings
         const { error: insertError } = await supabase
           .from('settings')
-          .insert({
+          .upsert({
             key: 'information_settings',
             value: defaultSettings
-          });
+          }, { onConflict: 'key' });
 
         if (insertError) throw insertError;
       } else {
@@ -180,7 +180,7 @@ const InformationForm: React.FC = () => {
         .upsert({
           key: 'information_settings',
           value: settings
-        });
+        }, { onConflict: 'key' });
 
       if (error) throw error;
       

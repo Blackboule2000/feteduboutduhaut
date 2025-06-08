@@ -1,11 +1,94 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import FlipTimer from './FlipTimer';
+import { supabase } from '../lib/supabase';
+
+interface HeroSettings {
+  title: string;
+  subtitle: string;
+  date: string;
+  main_image: string;
+  poster_image: string;
+  background_color: string;
+  social_links: {
+    facebook: string;
+    instagram: string;
+  };
+  countdown: {
+    enabled: boolean;
+    target_date: string;
+  };
+}
+
+const defaultSettings: HeroSettings = {
+  title: 'Fête du Bout du Haut',
+  subtitle: 'Festival Musical et Culturel',
+  date: '26 Juillet 2025',
+  main_image: 'http://www.image-heberg.fr/files/1747215665990305646.png',
+  poster_image: 'http://www.image-heberg.fr/files/17493815783183277355.jpg',
+  background_color: '#f6d9a0',
+  social_links: {
+    facebook: 'https://www.facebook.com/AssociationDuBoutDuHaut',
+    instagram: 'https://www.instagram.com/association_du_bout_du_haut'
+  },
+  countdown: {
+    enabled: true,
+    target_date: '2025-07-26T11:00:00'
+  }
+};
 
 const Hero: React.FC = () => {
+  const [settings, setSettings] = useState<HeroSettings>(defaultSettings);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    loadHeroSettings();
+  }, []);
+
+  const loadHeroSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('settings')
+        .select('value')
+        .eq('key', 'hero_settings')
+        .maybeSingle();
+
+      if (error) {
+        console.error('Erreur lors du chargement des paramètres Hero:', error);
+        return;
+      }
+
+      if (data?.value) {
+        // Fusionner les paramètres chargés avec les valeurs par défaut
+        setSettings({ ...defaultSettings, ...data.value });
+      }
+    } catch (err) {
+      console.error('Erreur lors du chargement des paramètres Hero:', err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return (
+      <section 
+        id="accueil" 
+        className="relative min-h-screen overflow-hidden"
+        style={{ backgroundColor: defaultSettings.background_color }}
+      >
+        <div className="absolute inset-0 bg-retro-pattern opacity-10"></div>
+        <div className="absolute inset-0 bg-noise opacity-20"></div>
+        <div className="container mx-auto px-4 flex items-center justify-center min-h-screen">
+          <div className="text-center text-[#ca5231]">Chargement...</div>
+        </div>
+      </section>
+    );
+  }
+
   return (
     <section 
       id="accueil" 
-      className="relative min-h-screen overflow-hidden bg-[#f6d9a0]"
+      className="relative min-h-screen overflow-hidden"
+      style={{ backgroundColor: settings.background_color }}
     >
       <div className="absolute inset-0 bg-retro-pattern opacity-10"></div>
       <div className="absolute inset-0 bg-noise opacity-20"></div>
@@ -53,8 +136,8 @@ const Hero: React.FC = () => {
             </div>
             
             <img 
-              src="http://www.image-heberg.fr/files/1747215665990305646.png"
-              alt="Fête du Bout du Haut"
+              src={settings.main_image}
+              alt={settings.title}
               className="mx-auto mb-8 w-[1000px] max-w-full h-auto"
               style={{ 
                 filter: 'brightness(1.1) saturate(0.85) contrast(0.9)',
@@ -66,16 +149,18 @@ const Hero: React.FC = () => {
       </div>
 
       {/* Timer Section */}
-      <div className="relative z-20 -mt-8 mb-12">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="bg-[#f6d9a0] rounded-xl p-6">
-            <h2 className="floating-text text-center font-['Swiss 721 Black Extended BT'] text-4xl md:text-5xl text-[#ca5231] mb-8 tracking-wider font-bold">
-              RENDEZ-VOUS DANS
-            </h2>
-            <FlipTimer targetDate={new Date("Jul 26, 2025 11:00:00")} />
+      {settings.countdown.enabled && (
+        <div className="relative z-20 -mt-8 mb-12">
+          <div className="max-w-4xl mx-auto px-4">
+            <div className="rounded-xl p-6" style={{ backgroundColor: settings.background_color }}>
+              <h2 className="floating-text text-center font-['Swiss 721 Black Extended BT'] text-4xl md:text-5xl text-[#ca5231] mb-8 tracking-wider font-bold">
+                RENDEZ-VOUS DANS
+              </h2>
+              <FlipTimer targetDate={new Date(settings.countdown.target_date)} />
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Main Content */}
       <div className="container mx-auto px-4 z-10">
@@ -96,8 +181,8 @@ const Hero: React.FC = () => {
           </div>
           
           <img 
-            src="http://www.image-heberg.fr/files/17486307723391673572.jpg" 
-            alt="Affiche Fête du Bout du Haut 2025"
+            src={settings.poster_image} 
+            alt={`Affiche ${settings.title} ${settings.date}`}
             className="w-full h-auto rounded-lg shadow-2xl mb-12"
           />
         </div>
